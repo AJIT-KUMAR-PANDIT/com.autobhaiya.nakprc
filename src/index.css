@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Custom Colors */
+  --color-primary: #0df259;
+  --color-primary-dark: #0bb542;
+  --color-secondary: #facc15;
+  --color-background-light: #f5f8f6;
+  --color-background-dark: #102216;
+  --color-card-light: #ffffff;
+  --color-card-dark: #1a2e22;
+  --color-text-main: #0d1c12;
+  --color-text-light: #e0e6e2;
+
+  /* Custom Fonts */
+  --font-display: "Inter", sans-serif;
+
+  /* Custom Shadows */
+  --shadow-glow: 0 0 15px rgba(13, 242, 89, 0.3);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.animate-blink {
+  animation: blink 1.5s infinite;
+}
