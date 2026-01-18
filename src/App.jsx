@@ -31,7 +31,19 @@ function App() {
           <Route path="/" element={<PersonalBhaiyaPage />} />
           <Route path="/payments" element={<PaymentsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/personal-bhaiya" element={<HomePage />} />
+          <Route path="/auto-bhaiya" element={<HomePage />} />
+          <Route
+            path="/auto-bhaiya/:vNumber"
+            element={<PersonalBhaiyaPage />}
+          />
+          <Route
+            path="/auto-bhaiya/:vNumber/payments"
+            element={<PaymentsPage />}
+          />
+          <Route
+            path="/auto-bhaiya/:vNumber/profile"
+            element={<ProfilePage />}
+          />
         </Routes>
       </div>
       <BottomNav />
