@@ -1,6 +1,49 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import csvUrl from "../../assets/data.autobhaiya.nakprc.csv?url";
 
 export default function Profile() {
+  const { vNumber } = useParams();
+  const navigate = useNavigate();
+  const [driver, setDriver] = useState({
+    name: "Bablu Bhaiya",
+    vehicleNumber: "MH 02 CR 5544",
+    schoolName: "",
+    rating: "4.9",
+  });
+
+  useEffect(() => {
+    fetch(csvUrl)
+      .then((response) => response.text())
+      .then((text) => {
+        const rows = text.split("\n").slice(1);
+        const parsedData = rows
+          .map((row) => {
+            const cols = row.split(",");
+            if (cols.length < 8) return null;
+            return {
+              autoNumber: cols[1],
+              driverName: cols[2]?.replace(/"/g, ""),
+              schoolName: cols[6]?.trim(),
+            };
+          })
+          .filter((item) => item !== null);
+
+        if (vNumber) {
+          const foundDriver = parsedData.find((d) => d.autoNumber === vNumber);
+          if (foundDriver) {
+            setDriver({
+              name: foundDriver.driverName,
+              vehicleNumber: foundDriver.autoNumber,
+              schoolName: foundDriver.schoolName,
+              rating: "4.9", // Mock rating
+            });
+          }
+        }
+      })
+      .catch((err) => console.error("Error loading CSV:", err));
+  }, [vNumber]);
+
   const stats = [
     { value: "5", label: "Years Exp." },
     { value: "1.2k", label: "Total Rides" },
@@ -26,7 +69,10 @@ export default function Profile() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 px-4 py-4 flex items-center border-b border-gray-200 dark:border-gray-700">
-        <button className="mr-4 text-2xl text-gray-900 dark:text-white">
+        <button
+          onClick={() => navigate(-1)}
+          className="mr-4 text-2xl text-gray-900 dark:text-white"
+        >
           ←
         </button>
         <h1 className="text-xl font-bold text-gray-900 dark:text-white">
@@ -52,14 +98,14 @@ export default function Profile() {
 
         {/* Driver Name */}
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">
-          Bablu Bhaiya
+          {driver.name}
         </h2>
 
         {/* Verified Badge */}
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-50 dark:bg-green-900/20 mb-3">
           <span className="text-green-600 dark:text-green-400">✓</span>
           <span className="text-sm font-semibold text-green-600 dark:text-green-400">
-            Verified Driver
+            Verified Driver {driver.schoolName && `• ${driver.schoolName}`}
           </span>
         </div>
 
@@ -73,7 +119,7 @@ export default function Profile() {
         <div className="inline-block">
           <div className="bg-yellow-400 border-4 border-black rounded-lg px-6 py-3">
             <span className="text-xl font-bold text-black tracking-wider">
-              MH 02 CR 5544
+              {driver.vehicleNumber}
             </span>
           </div>
         </div>

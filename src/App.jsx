@@ -28,10 +28,10 @@ function App() {
       <Header />
       <div className="pb-24 mb-44">
         <Routes>
-          <Route path="/" element={<PersonalBhaiyaPage />} />
-          <Route path="/payments" element={<PaymentsPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/auto-bhaiya" element={<HomePage />} />
+          <Route path="/" element={<HomePage />} />
+          {/* <Route path="/payments" element={<PaymentsPage />} /> */}
+          {/* <Route path="/profile" element={<ProfilePage />} /> */}
+          {/* <Route path="/auto-bhaiya" element={<PersonalBhaiyaPage />} /> */}
           <Route
             path="/auto-bhaiya/:vNumber"
             element={<PersonalBhaiyaPage />}
