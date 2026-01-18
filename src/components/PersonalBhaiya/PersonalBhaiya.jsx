@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import csvUrl from "../../assets/data.autobhaiya.nakprc.csv?url";
 import schoolsCsvUrl from "../../assets/schools.jamshedpur.csv?url";
+import Search from "../Shared/Search";
 
 export default function PersonalBhaiya() {
   const { vNumber } = useParams();
@@ -9,9 +10,9 @@ export default function PersonalBhaiya() {
 
   const [plateNumber, setPlateNumber] = useState(vNumber || "DL 1C 5678");
   const [isValid, setIsValid] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(undefined); // Used for override
   const [schoolRides, setSchoolRides] = useState([]);
-  const [filteredRides, setFilteredRides] = useState([]);
   const [schoolList, setSchoolList] = useState([]);
 
   useEffect(() => {
@@ -19,6 +20,14 @@ export default function PersonalBhaiya() {
       setPlateNumber(vNumber);
     }
   }, [vNumber]);
+
+  // Fetch Drivers Data (Still needed for checking if current page driver exists/details, but Search component handles its own data)
+  // Wait, if I remove fetching logic here, 'schoolRides' will be empty, so 'selectedDriver' won't work.
+  // We should keep the data fetching for THIS page's main purpose (showing the driver),
+  // OR update Search to expose data?
+  // No, better to duplicate the fetch or move fetch to a hook/context.
+  // For now, I will KEEP the fetch logic for 'schoolRides' so 'selectedDriver' works,
+  // but remove the search specific filtering logic.
 
   // Fetch Drivers Data
   useEffect(() => {
@@ -85,21 +94,7 @@ export default function PersonalBhaiya() {
       .catch((err) => console.error("Error loading Schools CSV:", err));
   }, []);
 
-  useEffect(() => {
-    if (searchQuery.trim() === "") {
-      setFilteredRides([]);
-    } else {
-      const lowerQuery = searchQuery.toLowerCase();
-      const filtered = schoolRides.filter(
-        (ride) =>
-          ride.schoolName?.toLowerCase().includes(lowerQuery) ||
-          ride.autoNumber?.toLowerCase().includes(lowerQuery)
-      );
-      setFilteredRides(filtered);
-    }
-  }, [searchQuery, schoolRides]);
-
-  // ... (Driver detail logic remains same)
+  // Removed Search Filter Logic
 
   const defaultDriver = {
     name: "Rajesh Kumar",
@@ -140,7 +135,7 @@ export default function PersonalBhaiya() {
   const handleSelectRide = (ride) => {
     setPlateNumber(ride.autoNumber);
     navigate(`/auto-bhaiya/${ride.autoNumber}`);
-    setSearchQuery("");
+    // Search query clearing handled by Search component
   };
 
   const handleSchoolClick = (schoolName) => {
@@ -225,49 +220,8 @@ export default function PersonalBhaiya() {
             </div>
           </div>
 
-          {/* Search Results in Main Stream - ONLY if search is active */}
-          {searchQuery && (
-            <div className="px-6 py-4">
-              <h3 className="text-lg font-bold text-gray-900 mb-2">
-                Search Results
-              </h3>
-              <div className="space-y-3 pb-32">
-                {filteredRides.length > 0 ? (
-                  filteredRides.map((ride, idx) => (
-                    <div
-                      key={idx}
-                      onClick={() => handleSelectRide(ride)}
-                      className="bg-white border border-gray-100 rounded-xl p-3 shadow-sm flex items-center gap-3 active:scale-[0.99] transition-transform cursor-pointer hover:border-emerald-200"
-                    >
-                      <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-xl">
-                        🛺
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex justify-between">
-                          <h4 className="font-bold text-gray-900 truncate">
-                            {ride.driverName}
-                          </h4>
-                          <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
-                            {ride.autoNumber}
-                          </span>
-                        </div>
-                        <p className="text-xs text-gray-500 truncate">
-                          {ride.schoolName} • {ride.vehicleType}
-                        </p>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-6 text-gray-500 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                    <p>No rides found matching "{searchQuery}"</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
           {/* Driver Card & Map (Hidden if searching) */}
-          {!searchQuery && (
+          {!isSearching && (
             <div className="px-6 mt-8">
               <div className="rounded-2xl bg-white border border-gray-200 shadow-lg overflow-hidden">
                 {/* Yellow accent bar */}
@@ -341,7 +295,7 @@ export default function PersonalBhaiya() {
           )}
 
           {/* Popular Schools Section (Replaces Favorites) */}
-          {!searchQuery && (
+          {!isSearching && (
             <div className="px-6 mt-8">
               <div className="flex justify-between items-end mb-4">
                 <h3 className="text-lg font-bold text-gray-900">
@@ -374,7 +328,7 @@ export default function PersonalBhaiya() {
         </main>
 
         {/* Bottom CTA - Hidden when searching */}
-        {!searchQuery && (
+        {!isSearching && (
           <div className="absolute bottom-0 left-0 w-full p-6 bg-linear-to-t from-white via-white to-transparent pt-12">
             <button className="w-full bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98] transition-all h-14 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/30">
               <span className="text-white font-bold text-lg tracking-wide">
@@ -386,20 +340,11 @@ export default function PersonalBhaiya() {
         )}
 
         {/* Bottom Search Bar (Fixed) */}
-        <div className="fixed bottom-14 left-0 w-full p-4 bg-white/80 backdrop-blur-lg border-t border-gray-200 z-50 pb-8">
-          <div className="relative max-w-md mx-auto">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search school or auto number..."
-              className="w-full bg-gray-100 border-none rounded-full px-5 py-3.5 pr-12 outline-none focus:ring-2 focus:ring-emerald-500/50 text-gray-800 shadow-sm font-medium"
-            />
-            <button className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-emerald-500 rounded-full flex items-center justify-center text-white text-sm shadow-md hover:bg-emerald-600 transition-colors">
-              🔍
-            </button>
-          </div>
-        </div>
+        <Search
+          overrideQuery={searchQuery}
+          onSearchStateChange={setIsSearching}
+          onSelectRide={handleSelectRide}
+        />
       </div>
 
       <style jsx>{`

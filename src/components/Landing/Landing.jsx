@@ -1,6 +1,10 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+import Search from "../Shared/Search";
 
 export default function Landing() {
+  const navigate = useNavigate();
+
   return (
     <div className="bg-[#f8f8f5] dark:bg-[#222110] font-sans text-neutral-900 dark:text-neutral-100 antialiased overflow-x-hidden pb-24 min-h-screen">
       <style>{`
@@ -270,6 +274,10 @@ export default function Landing() {
           </button>
         </div>
       </nav> */}
+
+      <Search
+        onSelectRide={(ride) => navigate(`/auto-bhaiya/${ride.autoNumber}`)}
+      />
     </div>
   );
 }
