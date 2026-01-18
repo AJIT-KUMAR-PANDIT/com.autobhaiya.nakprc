@@ -1,9 +1,56 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Search from "../Shared/Search";
+import csvUrl from "../../assets/data.autobhaiya.nakprc.csv?url";
 
 export default function Landing() {
   const navigate = useNavigate();
+  const [randomDrivers, setRandomDrivers] = useState([]);
+
+  useEffect(() => {
+    fetch(csvUrl)
+      .then((response) => response.text())
+      .then((text) => {
+        const rows = text.split("\n").slice(1);
+        const parseLine = (line) => {
+          const result = [];
+          let start = 0;
+          let inQuotes = false;
+          for (let i = 0; i < line.length; i++) {
+            if (line[i] === '"') {
+              inQuotes = !inQuotes;
+            } else if (line[i] === "," && !inQuotes) {
+              result.push(line.substring(start, i));
+              start = i + 1;
+            }
+          }
+          result.push(line.substring(start));
+          return result;
+        };
+
+        const parsedData = rows
+          .map((row) => {
+            if (!row.trim()) return null;
+            const cols = parseLine(row);
+            if (cols.length < 8) return null;
+            return {
+              name: cols[2]?.replace(/"/g, "").trim(),
+              details: `${cols[3] || "Auto Bhaiya"} • 5 Years Exp.`,
+              plate: cols[1],
+              trips: "500+ Trips",
+              rating: (4.5 + Math.random() * 0.5).toFixed(1),
+              img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAlxeGMP9evKuUvjfJ0dIw7m3RudvH0izf-IbfmaI0DZRRrOSF1lmvlPy8o1z6ZE_VYbGZOx64zgflo6WYhNY0M65w0WwuY-XBAYVV4g9d3JPEVBndCY7pQ4oKiWOjcflW912fXlWECpQ8ToH9-yYg4P8S2HEfOETCFgmnKL51gEw-RPBhyxkzZCt9nUuSVa3E2Qo8_6VlfHcmZhPbx7lrbfyPJr0769uBwKsa_0HKB9nfBHdtJAo8x0AxoeYR60Bq0fyCjkKp4enk",
+              badge: { icon: "shield_person", text: "Verified Guardian" },
+              autoNumber: cols[1],
+            };
+          })
+          .filter((item) => item !== null);
+
+        const shuffled = parsedData.sort(() => 0.5 - Math.random());
+        setRandomDrivers(shuffled.slice(0, 3));
+      })
+      .catch((err) => console.error("Error loading CSV:", err));
+  }, []);
 
   return (
     <div className="bg-[#f8f8f5] dark:bg-[#222110] font-sans text-neutral-900 dark:text-neutral-100 antialiased overflow-x-hidden pb-24 min-h-screen">
@@ -156,35 +203,8 @@ export default function Landing() {
         </h2>
         <div className="flex flex-col gap-5">
           {/* Driver Cards */}
-          {[
-            {
-              name: "Rajesh Kumar",
-              details: "Auto Bhaiya • 8 Years Exp.",
-              plate: "DL 1R K 2394",
-              trips: "500+ Trips",
-              rating: 4.9,
-              img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAlxeGMP9evKuUvjfJ0dIw7m3RudvH0izf-IbfmaI0DZRRrOSF1lmvlPy8o1z6ZE_VYbGZOx64zgflo6WYhNY0M65w0WwuY-XBAYVV4g9d3JPEVBndCY7pQ4oKiWOjcflW912fXlWECpQ8ToH9-yYg4P8S2HEfOETCFgmnKL51gEw-RPBhyxkzZCt9nUuSVa3E2Qo8_6VlfHcmZhPbx7lrbfyPJr0769uBwKsa_0HKB9nfBHdtJAo8x0AxoeYR60Bq0fyCjkKp4enk",
-              badge: { icon: "shield_person", text: "Verified Guardian" },
-            },
-            {
-              name: "Manoj Singh",
-              details: "Auto Bhaiya • 5 Years Exp.",
-              plate: "UP 16 Z 9921",
-              trips: "320+ Trips",
-              rating: 4.8,
-              img: "https://lh3.googleusercontent.com/aida-public/AB6AXuD_PfsgjDoNuvErH5z2mpvLh6WoacXsGtEx5_g0rrwDEjkF23MI9fK6-I2VVIP6vIq_Nq3sPY6vajI6zTo2cPaA8KaJm_XZ0W6_Lg8jVYotn5cE88DUx-TZ-m7buYd1ybxU3ANIedCNvPttsfXBk5BFZu9qrs0gsLjyzI2-Iew69z6RITSNNMVUypYff0bhYHQUT69eIdNa_EmEeaEAX0Hk93KZMAQP7o2Rayoc5018Koel-4kuEfRiHOvC28xUymcY6sjH5kS1R3c",
-              badge: { icon: "shield_person", text: "Verified Guardian" },
-            },
-            {
-              name: "Vikram Das",
-              details: "Van Service • 10 Years Exp.",
-              plate: "HR 55 C 1001",
-              trips: "800+ Trips",
-              rating: 4.7,
-              img: "https://lh3.googleusercontent.com/aida-public/AB6AXuBo9gMwvBa_UNbTajmCnGP6ZUOu6ETjedR8aeMBzlGXex0yyt6jCRRe9QaNIK_R4TfxpJyFnhokWkDSctlDuddeCjBltJmkpV11aYLYopC0bKRPsuZLA18d76XVtUNRv1JYqMN1M1BKoSWbFyH2MiIk7l7kS9TQoqKZUbQKymuh4pBK5sri9JxvNBq08ydrEjTQHfxdRCBGBnsCoHdxkLHoJ3i_54za1J3W4zbJi69Ud1U9APh_Nk-s3yufwArzVuWBy6n4SVgd2EQ",
-              badge: { icon: "vaccines", text: "Fully Vaccinated" },
-            },
-          ].map((driver, idx) => (
+          {/* Driver Cards */}
+          {randomDrivers.map((driver, idx) => (
             <div
               key={idx}
               className="bg-white dark:bg-[#2d2c1b] rounded-xl p-5 shadow-[0_0_0_1px_rgba(0,0,0,0.03),0_2px_8px_rgba(0,0,0,0.04)] relative overflow-hidden group"
@@ -236,7 +256,10 @@ export default function Landing() {
                 </div>
               </div>
               <div className="mt-5 flex gap-3">
-                <button className="flex-1 bg-[#f4e225] hover:bg-[#dcb808] text-neutral-900 font-bold py-3.5 rounded-full text-sm transition-colors shadow-sm flex items-center justify-center gap-2">
+                <button
+                  onClick={() => navigate(`/auto-bhaiya/${driver.autoNumber}`)}
+                  className="flex-1 bg-[#f4e225] hover:bg-[#dcb808] text-neutral-900 font-bold py-3.5 rounded-full text-sm transition-colors shadow-sm flex items-center justify-center gap-2"
+                >
                   Book for School
                 </button>
                 <button className="size-12 rounded-full border border-neutral-200 dark:border-neutral-700 flex items-center justify-center text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
