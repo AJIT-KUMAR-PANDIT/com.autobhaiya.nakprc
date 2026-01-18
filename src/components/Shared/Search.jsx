@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Search as SearchIcon } from "lucide-react";
 
 export default function Search({
   onSearchStateChange,
@@ -38,7 +39,7 @@ export default function Search({
           onClick={handleSearch}
           className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-emerald-500 rounded-full flex items-center justify-center text-white text-sm shadow-md hover:bg-emerald-600 transition-colors"
         >
-          🔍
+          <SearchIcon size={18} />
         </button>
       </div>
     </div>

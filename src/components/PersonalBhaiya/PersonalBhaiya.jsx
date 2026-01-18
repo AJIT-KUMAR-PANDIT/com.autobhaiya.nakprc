@@ -1,8 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import csvUrl from "../../assets/data.autobhaiya.nakprc.csv?url";
-import schoolsCsvUrl from "../../assets/schools.jamshedpur.csv?url";
 import Search from "../Shared/Search";
+import {
+  ShieldCheck,
+  Star,
+  Car,
+  Clock,
+  MessageCircle,
+  Check,
+  ArrowLeft,
+  ArrowRight,
+  Scan,
+} from "lucide-react";
 
 export default function PersonalBhaiya() {
   const { vNumber } = useParams();
@@ -21,20 +31,12 @@ export default function PersonalBhaiya() {
     }
   }, [vNumber]);
 
-  // Fetch Drivers Data (Still needed for checking if current page driver exists/details, but Search component handles its own data)
-  // Wait, if I remove fetching logic here, 'schoolRides' will be empty, so 'selectedDriver' won't work.
-  // We should keep the data fetching for THIS page's main purpose (showing the driver),
-  // OR update Search to expose data?
-  // No, better to duplicate the fetch or move fetch to a hook/context.
-  // For now, I will KEEP the fetch logic for 'schoolRides' so 'selectedDriver' works,
-  // but remove the search specific filtering logic.
-
-  // Fetch Drivers Data
+  // Fetch Drivers and Extract Schools
   useEffect(() => {
     fetch(csvUrl)
       .then((response) => response.text())
       .then((text) => {
-        const rows = text.split("\n").slice(1); // Skip header
+        const rows = text.split("\n").slice(1);
         const parseLine = (line) => {
           const result = [];
           let start = 0;
@@ -59,7 +61,7 @@ export default function PersonalBhaiya() {
             return {
               id: cols[0],
               autoNumber: cols[1],
-              driverName: cols[2]?.replace(/"/g, "").trim(), // Remove quotes
+              driverName: cols[2]?.replace(/"/g, "").trim(),
               vehicleType: cols[3],
               status: cols[4],
               serviceDate: cols[5],
@@ -68,33 +70,31 @@ export default function PersonalBhaiya() {
             };
           })
           .filter((item) => item !== null);
+
         setSchoolRides(parsedData);
+
+        // Extract Schools Logic (Consistent with Landing.jsx)
+        const uniqueSchoolNames = [
+          ...new Set(parsedData.map((d) => d.schoolName).filter(Boolean)),
+        ];
+        const colors = [
+          "bg-red-50 text-red-600 border-red-200",
+          "bg-blue-50 text-blue-600 border-blue-200",
+          "bg-green-50 text-green-600 border-green-200",
+          "bg-orange-50 text-orange-600 border-orange-200",
+          "bg-purple-50 text-purple-600 border-purple-200",
+        ];
+
+        const formattedSchools = uniqueSchoolNames.map((name, index) => ({
+          name: name,
+          avatar: name.charAt(0).toUpperCase(),
+          style: colors[index % colors.length],
+        }));
+
+        setSchoolList(formattedSchools);
       })
       .catch((err) => console.error("Error loading CSV:", err));
   }, []);
-
-  // Fetch Schools Data
-  useEffect(() => {
-    fetch(schoolsCsvUrl)
-      .then((response) => response.text())
-      .then((text) => {
-        const rows = text.split("\n").slice(1);
-        const parsedSchools = rows
-          .map((row) => {
-            const cols = row.split(",");
-            if (cols.length < 2) return null;
-            return {
-              name: cols[0]?.trim(),
-              avatar: cols[1]?.trim(),
-            };
-          })
-          .filter((item) => item !== null);
-        setSchoolList(parsedSchools);
-      })
-      .catch((err) => console.error("Error loading Schools CSV:", err));
-  }, []);
-
-  // Removed Search Filter Logic
 
   const defaultDriver = {
     name: "Rajesh Kumar",
@@ -135,7 +135,6 @@ export default function PersonalBhaiya() {
   const handleSelectRide = (ride) => {
     setPlateNumber(ride.autoNumber);
     navigate(`/auto-bhaiya/${ride.autoNumber}`);
-    // Search query clearing handled by Search component
   };
 
   const handleSchoolClick = (schoolName) => {
@@ -153,7 +152,7 @@ export default function PersonalBhaiya() {
               onClick={() => navigate("/")}
               className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
             >
-              <span className="text-xl">←</span>
+              <ArrowLeft size={24} />
             </button>
             <h2 className="text-lg font-bold">Book My Bhaiya</h2>
             <div className="w-10" />
@@ -200,9 +199,9 @@ export default function PersonalBhaiya() {
                 <div className="pr-4">
                   <button
                     onClick={handleVerify}
-                    className="bg-gray-900 text-white rounded-full p-2 hover:bg-gray-800 transition-colors"
+                    className="bg-gray-900 text-white rounded-full p-2 hover:bg-gray-800 transition-colors flex items-center justify-center"
                   >
-                    <span className="text-lg">✓</span>
+                    <Check size={20} />
                   </button>
                 </div>
               </div>
@@ -211,11 +210,12 @@ export default function PersonalBhaiya() {
             <div className="flex justify-between items-center mt-3 px-1">
               {isValid && (
                 <span className="text-xs font-semibold text-emerald-600 flex items-center gap-1">
-                  <span className="text-sm">🛡️</span> Valid Registration
+                  <ShieldCheck size={14} className="text-emerald-600" /> Valid
+                  Registration
                 </span>
               )}
-              <button className="text-sm font-bold text-gray-500 hover:text-emerald-600 transition-colors ml-auto">
-                Scan Plate
+              <button className="text-sm font-bold text-gray-500 hover:text-emerald-600 transition-colors ml-auto flex items-center gap-1">
+                <Scan size={14} /> Scan Plate
               </button>
             </div>
           </div>
@@ -235,7 +235,8 @@ export default function PersonalBhaiya() {
                         {driver.avatar}
                       </div>
                       <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full border-2 border-white shadow-sm flex items-center gap-1">
-                        {driver.rating} <span>⭐</span>
+                        {driver.rating}{" "}
+                        <Star size={10} fill="currentColor" strokeWidth={0} />
                       </div>
                     </div>
 
@@ -250,12 +251,12 @@ export default function PersonalBhaiya() {
                             {driver.rides} Rides
                           </p>
                         </div>
-                        <span className="text-2xl text-emerald-500">🛡️</span>
+                        <ShieldCheck size={24} className="text-emerald-500" />
                       </div>
 
                       <div className="mt-3 flex items-center gap-2">
                         <div className="bg-gray-50 px-3 py-1.5 rounded-lg flex items-center gap-2 border border-gray-200">
-                          <span className="text-yellow-500">🚗</span>
+                          <Car size={16} className="text-yellow-500" />
                           <span className="text-xs font-semibold uppercase tracking-wide text-gray-700">
                             {driver.vehicle}
                           </span>
@@ -284,10 +285,10 @@ export default function PersonalBhaiya() {
                 {/* Footer */}
                 <div className="bg-gray-50 px-5 py-3 border-t border-gray-100 flex justify-between items-center text-xs text-gray-500">
                   <span className="flex items-center gap-1">
-                    <span>🕐</span> Arrives in {driver.arrivalTime}
+                    <Clock size={14} /> Arrives in {driver.arrivalTime}
                   </span>
                   <span className="flex items-center gap-1">
-                    <span>🗣️</span> Speaks {driver.languages}
+                    <MessageCircle size={14} /> Speaks {driver.languages}
                   </span>
                 </div>
               </div>
@@ -310,8 +311,14 @@ export default function PersonalBhaiya() {
                     onClick={() => handleSchoolClick(school.name)}
                     className="flex flex-col items-center gap-2 group min-w-[72px]"
                   >
-                    <div className="w-16 h-16 rounded-full p-0.5 border-2 border-transparent group-hover:border-emerald-500 transition-all">
-                      <div className="w-full h-full rounded-full overflow-hidden bg-emerald-50 flex items-center justify-center text-3xl">
+                    <div
+                      className={`w-16 h-16 rounded-full p-0.5 border-2 transition-all ${
+                        school.style.split(" ")[2]
+                      }`}
+                    >
+                      <div
+                        className={`w-full h-full rounded-full overflow-hidden flex items-center justify-center text-2xl font-bold ${school.style}`}
+                      >
                         {school.avatar}
                       </div>
                     </div>
@@ -334,7 +341,7 @@ export default function PersonalBhaiya() {
               <span className="text-white font-bold text-lg tracking-wide">
                 Request This Bhaiya
               </span>
-              <span className="text-white text-xl">→</span>
+              <ArrowRight size={24} className="text-white" />
             </button>
           </div>
         )}

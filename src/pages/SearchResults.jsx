@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import csvUrl from "../assets/data.autobhaiya.nakprc.csv?url";
+import { ShieldCheck, Star, MessageCircle } from "lucide-react";
 
 export default function SearchResultsPage() {
   const [searchParams] = useSearchParams();
@@ -124,9 +125,7 @@ export default function SearchResultsPage() {
             >
               <div className="absolute top-0 right-0 p-3">
                 <div className="bg-emerald-50 text-emerald-600 rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-wider border border-emerald-100 flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[14px]">
-                    shield_person
-                  </span>
+                  <ShieldCheck size={14} className="text-emerald-600" />
                   Verified Guardian
                 </div>
               </div>
@@ -137,10 +136,7 @@ export default function SearchResultsPage() {
                   </div>
                   <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm">
                     <div className="bg-yellow-400 text-black text-[10px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5">
-                      4.9{" "}
-                      <span className="material-symbols-outlined text-[10px]">
-                        star
-                      </span>
+                      4.9 <Star size={10} fill="currentColor" strokeWidth={0} />
                     </div>
                   </div>
                 </div>
@@ -173,7 +169,7 @@ export default function SearchResultsPage() {
                   Book for School
                 </button>
                 <button className="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-colors">
-                  <span className="material-symbols-outlined">chat</span>
+                  <MessageCircle size={20} />
                 </button>
               </div>
             </div>

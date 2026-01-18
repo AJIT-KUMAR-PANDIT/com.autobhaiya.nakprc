@@ -1,6 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import csvUrl from "../../assets/data.autobhaiya.nakprc.csv?url";
+import {
+  ArrowLeft,
+  MapPin,
+  BadgeCheck,
+  CarFront,
+  Syringe,
+  Banknote,
+  Languages,
+  Shield,
+  Star,
+  MessageCircle,
+  Phone,
+} from "lucide-react";
 
 export default function Profile() {
   const { vNumber } = useParams();
@@ -76,10 +89,10 @@ export default function Profile() {
   ];
 
   const safetyFeatures = [
-    { icon: "💉", label: "Vaccinated" },
-    { icon: "💵", label: "UPI/Cash" },
-    { icon: "🗣️", label: "English Speaking" },
-    { icon: "😷", label: "Mask On" },
+    { icon: <Syringe size={24} />, label: "Vaccinated" },
+    { icon: <Banknote size={24} />, label: "UPI/Cash" },
+    { icon: <Languages size={24} />, label: "English Speaking" },
+    { icon: <Shield size={24} />, label: "Mask On" },
   ];
 
   return (
@@ -88,9 +101,9 @@ export default function Profile() {
       <div className="bg-white dark:bg-gray-800 px-4 py-4 flex items-center border-b border-gray-200 dark:border-gray-700">
         <button
           onClick={() => navigate(-1)}
-          className="mr-4 text-2xl text-gray-900 dark:text-white"
+          className="mr-4 text-gray-900 dark:text-white"
         >
-          ←
+          <ArrowLeft size={24} />
         </button>
         <h1 className="text-xl font-bold text-gray-900 dark:text-white">
           Driver Profile
@@ -106,7 +119,10 @@ export default function Profile() {
           </div>
           <div className="relative w-36 h-36 rounded-full bg-gradient-to-br from-green-400 via-green-400 to-yellow-400 p-1">
             <div className="w-full h-full rounded-full bg-amber-50 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
-              <span className="text-6xl">🛺</span>
+              <CarFront
+                size={64}
+                className="text-gray-600 dark:text-gray-300"
+              />
             </div>
           </div>
           {/* Online Indicator */}
@@ -120,7 +136,10 @@ export default function Profile() {
 
         {/* Verified Badge */}
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-50 dark:bg-green-900/20 mb-3">
-          <span className="text-green-600 dark:text-green-400">✓</span>
+          <BadgeCheck
+            size={16}
+            className="text-green-600 dark:text-green-400"
+          />
           <span className="text-sm font-semibold text-green-600 dark:text-green-400">
             Verified Driver {driver.schoolName && `• ${driver.schoolName}`}
           </span>
@@ -128,7 +147,7 @@ export default function Profile() {
 
         {/* Location */}
         <div className="flex items-center justify-center gap-2 text-gray-600 dark:text-gray-400 mb-4">
-          <span>📍</span>
+          <MapPin size={16} />
           <span className="text-base">Mumbai, Maharashtra</span>
         </div>
 
@@ -178,9 +197,13 @@ export default function Profile() {
             </div>
             <div className="flex gap-1 mb-2">
               {[1, 2, 3, 4, 5].map((star) => (
-                <span key={star} className="text-green-400 text-xl">
-                  {star === 5 ? "☆" : "★"}
-                </span>
+                <Star
+                  key={star}
+                  size={20}
+                  className={star === 5 ? "text-gray-300" : "text-green-400"}
+                  fill={star === 5 ? "none" : "currentColor"}
+                  strokeWidth={star === 5 ? 2 : 0}
+                />
               ))}
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400">
@@ -221,7 +244,9 @@ export default function Profile() {
               key={index}
               className="flex items-center gap-3 px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700"
             >
-              <span className="text-2xl">{feature.icon}</span>
+              <span className="text-gray-700 dark:text-gray-200">
+                {feature.icon}
+              </span>
               <span className="text-base font-medium text-gray-900 dark:text-white">
                 {feature.label}
               </span>
@@ -234,11 +259,11 @@ export default function Profile() {
       <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 px-4 py-4 border-t border-gray-200 dark:border-gray-700">
         <div className="flex gap-3 max-w-2xl mx-auto">
           <button className="flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-full border-2 border-gray-900 dark:border-white bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-bold text-lg active:scale-95 transition-transform">
-            <span className="text-xl">💬</span>
+            <MessageCircle size={24} />
             <span>Message</span>
           </button>
           <button className="flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-full bg-green-400 hover:bg-green-500 text-black font-bold text-lg active:scale-95 transition-transform shadow-lg">
-            <span className="text-xl">📞</span>
+            <Phone size={24} />
             <span>Call Driver</span>
           </button>
         </div>

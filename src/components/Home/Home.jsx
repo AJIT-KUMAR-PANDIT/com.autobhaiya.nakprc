@@ -1,5 +1,14 @@
 "use client";
 import React, { useState } from "react";
+import {
+  ArrowLeft,
+  CarFront,
+  Bike,
+  Gem,
+  CreditCard,
+  Tag,
+  ArrowRight,
+} from "lucide-react";
 
 export default function Home() {
   const [selectedRide, setSelectedRide] = useState("auto");
@@ -8,7 +17,7 @@ export default function Home() {
     {
       id: "auto",
       name: "Auto Bhaiya",
-      icon: "🛺",
+      icon: <CarFront size={28} />,
       time: "4 min",
       passengers: "3 passengers",
       price: "₹145",
@@ -19,7 +28,7 @@ export default function Home() {
     {
       id: "bike",
       name: "Bike Bhaiya",
-      icon: "🏍️",
+      icon: <Bike size={28} />,
       time: "2 min",
       passengers: "1 passenger",
       price: "₹85",
@@ -29,7 +38,7 @@ export default function Home() {
     {
       id: "premium",
       name: "Premium Auto",
-      icon: "💎",
+      icon: <Gem size={28} />,
       time: "6 min",
       passengers: "WiFi + Music",
       price: "₹190",
@@ -56,7 +65,7 @@ export default function Home() {
 
         {/* Back Button */}
         <button className="absolute top-12 left-5 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white dark:bg-gray-800 shadow-md active:scale-95 transition-transform">
-          <span className="text-black dark:text-white text-xl">←</span>
+          <ArrowLeft size={20} className="text-black dark:text-white" />
         </button>
 
         {/* Map Pin */}
@@ -105,9 +114,7 @@ export default function Home() {
                   <div
                     className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full ${ride.iconBg} shadow-sm border border-gray-100 dark:border-gray-700`}
                   >
-                    <span className={`text-3xl ${ride.iconColor}`}>
-                      {ride.icon}
-                    </span>
+                    <span className={`${ride.iconColor}`}>{ride.icon}</span>
                   </div>
 
                   {/* Info */}
@@ -152,15 +159,14 @@ export default function Home() {
           {/* Payment & Promo Row */}
           <div className="flex items-center justify-between mb-4">
             <button className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-              <span className="text-lg">💳</span>
+              <CreditCard size={18} />
               <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
                 Cash
               </span>
-              <span className="text-sm text-gray-500">▼</span>
             </button>
 
             <button className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors">
-              <span className="text-lg">🏷️</span>
+              <Tag size={18} className="text-green-700 dark:text-green-400" />
               <span className="text-sm font-semibold text-green-700 dark:text-green-400">
                 Apply Coupon
               </span>
@@ -172,7 +178,7 @@ export default function Home() {
             <span>
               Confirm {rides.find((r) => r.id === selectedRide)?.name}
             </span>
-            <span className="text-xl font-bold">→</span>
+            <ArrowRight size={20} className="font-bold" />
           </button>
         </div>
       </div>
