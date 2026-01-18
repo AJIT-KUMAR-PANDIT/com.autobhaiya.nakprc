@@ -17,13 +17,30 @@ export default function Profile() {
       .then((response) => response.text())
       .then((text) => {
         const rows = text.split("\n").slice(1);
+        const parseLine = (line) => {
+          const result = [];
+          let start = 0;
+          let inQuotes = false;
+          for (let i = 0; i < line.length; i++) {
+            if (line[i] === '"') {
+              inQuotes = !inQuotes;
+            } else if (line[i] === "," && !inQuotes) {
+              result.push(line.substring(start, i));
+              start = i + 1;
+            }
+          }
+          result.push(line.substring(start));
+          return result;
+        };
+
         const parsedData = rows
           .map((row) => {
-            const cols = row.split(",");
+            if (!row.trim()) return null;
+            const cols = parseLine(row);
             if (cols.length < 8) return null;
             return {
               autoNumber: cols[1],
-              driverName: cols[2]?.replace(/"/g, ""),
+              driverName: cols[2]?.replace(/"/g, "").trim(),
               schoolName: cols[6]?.trim(),
             };
           })
