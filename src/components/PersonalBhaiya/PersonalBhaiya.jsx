@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import csvUrl from "../../assets/data.autobhaiya.nakprc.csv?url";
+import schoolsCsvUrl from "../../assets/schools.jamshedpur.csv?url";
 
 export default function PersonalBhaiya() {
   const { vNumber } = useParams();
@@ -11,6 +12,7 @@ export default function PersonalBhaiya() {
   const [searchQuery, setSearchQuery] = useState("");
   const [schoolRides, setSchoolRides] = useState([]);
   const [filteredRides, setFilteredRides] = useState([]);
+  const [schoolList, setSchoolList] = useState([]);
 
   useEffect(() => {
     if (vNumber) {
@@ -18,6 +20,7 @@ export default function PersonalBhaiya() {
     }
   }, [vNumber]);
 
+  // Fetch Drivers Data
   useEffect(() => {
     fetch(csvUrl)
       .then((response) => response.text())
@@ -61,6 +64,27 @@ export default function PersonalBhaiya() {
       .catch((err) => console.error("Error loading CSV:", err));
   }, []);
 
+  // Fetch Schools Data
+  useEffect(() => {
+    fetch(schoolsCsvUrl)
+      .then((response) => response.text())
+      .then((text) => {
+        const rows = text.split("\n").slice(1);
+        const parsedSchools = rows
+          .map((row) => {
+            const cols = row.split(",");
+            if (cols.length < 2) return null;
+            return {
+              name: cols[0]?.trim(),
+              avatar: cols[1]?.trim(),
+            };
+          })
+          .filter((item) => item !== null);
+        setSchoolList(parsedSchools);
+      })
+      .catch((err) => console.error("Error loading Schools CSV:", err));
+  }, []);
+
   useEffect(() => {
     if (searchQuery.trim() === "") {
       setFilteredRides([]);
@@ -74,6 +98,8 @@ export default function PersonalBhaiya() {
       setFilteredRides(filtered);
     }
   }, [searchQuery, schoolRides]);
+
+  // ... (Driver detail logic remains same)
 
   const defaultDriver = {
     name: "Rajesh Kumar",
@@ -102,13 +128,6 @@ export default function PersonalBhaiya() {
       }
     : defaultDriver;
 
-  const favorites = [
-    { name: "Amit", avatar: "👨" },
-    { name: "Vikram", avatar: "🧔" },
-    { name: "Singh", avatar: "👨‍🦰" },
-    { name: "Dev", avatar: "👨‍💼" },
-  ];
-
   const handlePlateChange = (e) => {
     const value = e.target.value.toUpperCase();
     setPlateNumber(value);
@@ -124,8 +143,13 @@ export default function PersonalBhaiya() {
     setSearchQuery("");
   };
 
+  const handleSchoolClick = (schoolName) => {
+    setSearchQuery(schoolName);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white">
+      {/* ... (Header, Hero, Input, Search Results, Driver Card Sections remain same) */}
       <div className="max-w-md mx-auto min-h-screen bg-white shadow-2xl relative flex flex-col">
         {/* Header */}
         <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-gray-100">
@@ -316,46 +340,37 @@ export default function PersonalBhaiya() {
             </div>
           )}
 
-          {/* Favorites Section */}
+          {/* Popular Schools Section (Replaces Favorites) */}
           {!searchQuery && (
             <div className="px-6 mt-8">
               <div className="flex justify-between items-end mb-4">
                 <h3 className="text-lg font-bold text-gray-900">
-                  Your Favorites
+                  Popular Schools
                 </h3>
-                <button className="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors">
-                  See all
-                </button>
               </div>
 
               <div className="flex gap-4 overflow-x-auto pb-4 -mx-6 px-6 no-scrollbar">
-                {favorites.map((fav, idx) => (
+                {schoolList.map((school, idx) => (
                   <button
                     key={idx}
+                    onClick={() => handleSchoolClick(school.name)}
                     className="flex flex-col items-center gap-2 group min-w-[72px]"
                   >
                     <div className="w-16 h-16 rounded-full p-0.5 border-2 border-transparent group-hover:border-emerald-500 transition-all">
-                      <div className="w-full h-full rounded-full overflow-hidden bg-gray-100 flex items-center justify-center text-3xl">
-                        {fav.avatar}
+                      <div className="w-full h-full rounded-full overflow-hidden bg-emerald-50 flex items-center justify-center text-3xl">
+                        {school.avatar}
                       </div>
                     </div>
                     <span className="text-xs font-medium text-center truncate w-full text-gray-700">
-                      {fav.name}
+                      {school.name.split(" ")[0]}
                     </span>
                   </button>
                 ))}
-
-                <button className="flex flex-col items-center gap-2 group min-w-[72px]">
-                  <div className="w-16 h-16 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors">
-                    <span className="text-2xl text-gray-400">+</span>
-                  </div>
-                  <span className="text-xs font-medium text-center truncate w-full text-gray-400">
-                    Add
-                  </span>
-                </button>
               </div>
             </div>
           )}
+
+          {/* Bottom CTA & Search Bar logic remains same */}
         </main>
 
         {/* Bottom CTA - Hidden when searching */}
