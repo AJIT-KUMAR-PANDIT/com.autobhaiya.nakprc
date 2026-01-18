@@ -6,6 +6,7 @@ import ProfilePage from "@/pages/Profile";
 import Header from "@/components/Shared/Header";
 import BottomNav from "@/components/Shared/BottomNav";
 import Loader from "@/components/Shared/Loader";
+import PersonalBhaiyaPage from "@/pages/PersonalBhaiya";
 import "./App.css";
 
 function App() {
@@ -27,9 +28,10 @@ function App() {
       <Header />
       <div className="pb-24 mb-44">
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<PersonalBhaiyaPage />} />
           <Route path="/payments" element={<PaymentsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/personal-bhaiya" element={<HomePage />} />
         </Routes>
       </div>
       <BottomNav />
