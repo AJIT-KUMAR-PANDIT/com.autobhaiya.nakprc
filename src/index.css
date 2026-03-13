@@ -31,12 +31,9 @@
   --shadow-glow: 0 0 15px rgba(13, 242, 89, 0.3);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+
+/* Dark mode is disabled by restricting the dark variant to a class that is never applied */
+@custom-variant dark (&:where(.dark, .dark *));
 
 body {
   background: var(--background);

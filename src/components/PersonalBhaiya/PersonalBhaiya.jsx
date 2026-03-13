@@ -67,6 +67,7 @@ export default function PersonalBhaiya() {
               serviceDate: cols[5],
               schoolName: cols[6]?.trim(),
               mapsUrl: cols[7]?.trim(),
+              whatsappNumber: cols[8]?.replace(/"/g, "").trim(),
             };
           })
           .filter((item) => item !== null);
@@ -106,6 +107,7 @@ export default function PersonalBhaiya() {
     avatar: "👨‍🦱",
     mapsUrl:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3502.9360824907153!2d77.218408074747!3d28.601693075681647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce2db961be393%3A0xf6c24c15321cf584!2sIndia%20Gate!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin",
+    whatsappNumber: "+919999999999",
   };
 
   const selectedDriver = schoolRides.find((r) => r.autoNumber === plateNumber);
@@ -120,6 +122,7 @@ export default function PersonalBhaiya() {
         languages: "Hindi",
         avatar: "👮", // Different avatar for found driver
         mapsUrl: selectedDriver.mapsUrl,
+        whatsappNumber: selectedDriver.whatsappNumber || "+919999999999",
       }
     : defaultDriver;
 
@@ -337,7 +340,12 @@ export default function PersonalBhaiya() {
         {/* Bottom CTA - Hidden when searching */}
         {!isSearching && (
           <div className="absolute bottom-0 left-0 w-full p-6 bg-linear-to-t from-white via-white to-transparent pt-12">
-            <button className="w-full bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98] transition-all h-14 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/30">
+            <button 
+              onClick={() => {
+                const message = encodeURIComponent(`Hi ${driver.name}, I would like to request your auto (Number: ${plateNumber})!`);
+                window.open(`https://wa.me/${driver.whatsappNumber}?text=${message}`, "_blank");
+              }}
+              className="w-full bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98] transition-all h-14 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/30">
               <span className="text-white font-bold text-lg tracking-wide">
                 Request This Bhaiya
               </span>
