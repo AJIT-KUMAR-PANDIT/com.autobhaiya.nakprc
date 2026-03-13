@@ -1,12 +1,15 @@
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Home, History, Wallet, User } from "lucide-react";
 
 export default function BottomNav() {
   const { pathname } = useLocation();
-  const { vNumber } = useParams();
 
-  // If we have a vNumber, the base path changes
-  const basePath = vNumber ? `/auto-bhaiya/${vNumber}` : "/";
+  // Extract vNumber from pathname e.g., /auto-bhaiya/DL1C5678
+  const match = pathname.match(/\/auto-bhaiya\/([^/]+)/);
+  const pathVNumber = match ? match[1] : null;
+
+  // Use pathVNumber, or fallback to localStorage
+  const vNumber = pathVNumber || (typeof window !== 'undefined' ? localStorage.getItem("currentVNumber") : null);
 
   // Build the correct links dynamically depending on context
   const homeLink = vNumber ? `/auto-bhaiya/${vNumber}` : "/";
