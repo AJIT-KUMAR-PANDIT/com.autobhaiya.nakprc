@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import HomePage from "@/pages/Home";
 import PaymentsPage from "@/pages/Payments";
 import ProfilePage from "@/pages/Profile";
@@ -8,6 +8,7 @@ import BottomNav from "@/components/Shared/BottomNav";
 import Loader from "@/components/Shared/Loader";
 import PersonalBhaiyaPage from "@/pages/PersonalBhaiya";
 import LandingPage from "@/pages/Landing";
+import WebLanding from "@/pages/WebLanding";
 import SearchResultsPage from "@/pages/SearchResults";
 import HistoryPage from "@/pages/History";
 import ScannerPage from "@/pages/Scanner";
@@ -15,6 +16,7 @@ import "./App.css";
 
 function App() {
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -27,12 +29,16 @@ function App() {
     return <Loader />;
   }
 
+  // Do not show Header/BottomNav on the marketing WebLanding page
+  const isWebLanding = location.pathname === "/";
+
   return (
     <>
-      <Header />
-      <div className="pb-24 mb-44">
+      {!isWebLanding && <Header />}
+      <div className={!isWebLanding ? "pb-24 mb-44 pt-[10px]" : "pb-0 mb-0"}>
         <Routes>
-          <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={<WebLanding />} />
+          <Route path="/app" element={<LandingPage />} />
           <Route path="/search" element={<SearchResultsPage />} />
           <Route path="/history" element={<HistoryPage />} />
           <Route path="/scan" element={<ScannerPage />} />
@@ -53,7 +59,7 @@ function App() {
           />
         </Routes>
       </div>
-      <BottomNav />
+      {!isWebLanding && <BottomNav />}
     </>
   );
 }
