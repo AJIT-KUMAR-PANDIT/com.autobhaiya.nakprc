@@ -1,16 +1,8 @@
-# netlify.toml
-
 [build]
   command = "npm run build"
-  publish = ".next"
+  publish = "dist"
 
-  # Tell Netlify to use Next.js plugin
-  functions = "netlify/functions"
-  edge_functions = ".netlify/edge-functions"
-
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
-
-# Disable secret scanning (Netlify still scans, but won't fail build)
-[build.environment]
-  NETLIFY_SECRETS_SCAN_DISABLED = "true"
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
