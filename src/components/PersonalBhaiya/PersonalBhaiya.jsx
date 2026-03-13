@@ -141,6 +141,35 @@ export default function PersonalBhaiya() {
     navigate(`/auto-bhaiya/${ride.autoNumber}`);
   };
 
+  // Save to history when a driver is found
+  useEffect(() => {
+    if (selectedDriver) {
+      try {
+        const historyJson = localStorage.getItem("searchHistory");
+        let history = historyJson ? JSON.parse(historyJson) : [];
+        
+        // Remove if exists to push to top
+        history = history.filter(d => d.autoNumber !== selectedDriver.autoNumber);
+        
+        // Add to top of history
+        history.unshift({
+          name: selectedDriver.driverName,
+          autoNumber: selectedDriver.autoNumber,
+          vehicleType: selectedDriver.vehicleType,
+          rating: 4.8, // Mock as it's static for now
+          timestamp: new Date().toISOString()
+        });
+        
+        // Keep only last 20
+        history = history.slice(0, 20);
+        
+        localStorage.setItem("searchHistory", JSON.stringify(history));
+      } catch (e) {
+        console.error("Could not save history", e);
+      }
+    }
+  }, [selectedDriver]);
+
   const handleSchoolClick = (schoolName) => {
     setSearchQuery(schoolName);
   };
