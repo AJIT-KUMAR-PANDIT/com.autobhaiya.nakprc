@@ -12,6 +12,8 @@ import {
   ArrowLeft,
   ArrowRight,
   Scan,
+  MapPin,
+  Navigation,
 } from "lucide-react";
 
 export default function PersonalBhaiya() {
@@ -24,6 +26,7 @@ export default function PersonalBhaiya() {
   const [searchQuery, setSearchQuery] = useState(undefined); // Used for override
   const [schoolRides, setSchoolRides] = useState([]);
   const [schoolList, setSchoolList] = useState([]);
+  const [goAnywhereDest, setGoAnywhereDest] = useState("");
 
   useEffect(() => {
     if (vNumber) {
@@ -360,6 +363,62 @@ export default function PersonalBhaiya() {
                     </span>
                   </button>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* Go Anywhere Section */}
+          {!isSearching && (
+            <div className="px-6 mt-8">
+              <div className="rounded-2xl bg-gradient-to-br from-yellow-50 to-amber-50 border border-yellow-200 p-5">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center">
+                    <Navigation size={22} className="text-black" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-gray-900">
+                      Go Anywhere
+                    </h3>
+                    <p className="text-xs text-gray-500">
+                      Book an auto for any destination
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <div className="flex-1 relative">
+                    <MapPin
+                      size={18}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    />
+                    <input
+                      type="text"
+                      value={goAnywhereDest}
+                      onChange={(e) => setGoAnywhereDest(e.target.value)}
+                      placeholder="Where to?"
+                      className="w-full bg-white border border-gray-200 rounded-full pl-10 pr-3.5 py-2.5 text-sm font-medium outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 text-gray-800 placeholder:text-gray-400"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          const value = e.target.value.trim();
+                          if (value) {
+                            navigate(`/search?go-anywhere=${encodeURIComponent(value)}`);
+                          }
+                        }
+                      }}
+                    />
+                  </div>
+                  <button
+                    onClick={() => {
+                      const value = goAnywhereDest.trim();
+                      if (value) {
+                        navigate(`/search?go-anywhere=${encodeURIComponent(value)}`);
+                      }
+                    }}
+                    className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold px-4 py-2.5 rounded-full transition-colors flex items-center gap-1.5 shrink-0"
+                  >
+                    <ArrowRight size={18} />
+                  </button>
+                </div>
               </div>
             </div>
           )}

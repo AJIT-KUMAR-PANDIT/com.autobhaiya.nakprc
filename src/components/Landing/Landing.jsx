@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Search from "../Shared/Search";
 import csvUrl from "../../assets/data.autobhaiya.nakprc.csv?url";
-import { ShieldCheck, ArrowRight, Star, MessageCircle } from "lucide-react";
+import { ShieldCheck, ArrowRight, Star, MessageCircle, MapPin, Navigation } from "lucide-react";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -151,6 +151,65 @@ export default function Landing() {
           ) : (
             <div className="px-5 text-sm text-gray-500">Loading schools...</div>
           )}
+        </div>
+      </section>
+
+      {/* Go Anywhere Section */}
+      <section className="mt-8 px-5">
+        <div className="rounded-2xl bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/10 dark:to-amber-900/10 border border-yellow-200 dark:border-yellow-700/30 p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 rounded-full bg-yellow-400 dark:bg-yellow-500 flex items-center justify-center shadow-sm">
+              <Navigation size={24} className="text-black" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">
+                Go Anywhere
+              </h2>
+              <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                Book an auto for any destination
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-2">
+            <div className="flex-1 relative">
+              <MapPin
+                size={18}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
+              />
+              <input
+                type="text"
+                placeholder="Enter destination..."
+                className="w-full bg-white dark:bg-[#2d2c1b] border border-gray-200 dark:border-gray-600 rounded-full pl-10 pr-4 py-3 text-sm font-medium outline-none focus:border-yellow-400 dark:focus:border-yellow-500 focus:ring-2 focus:ring-yellow-400/20 transition-all text-gray-800 dark:text-gray-100 placeholder:text-gray-400"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    const value = e.target.value.trim();
+                    if (value) {
+                      navigate(`/search?go-anywhere=${encodeURIComponent(value)}`);
+                    }
+                  }
+                }}
+                id="go-anywhere-input"
+              />
+            </div>
+            <button
+              onClick={() => {
+                const input = document.getElementById("go-anywhere-input");
+                const value = input?.value?.trim();
+                if (value) {
+                  navigate(`/search?go-anywhere=${encodeURIComponent(value)}`);
+                }
+              }}
+              className="bg-yellow-400 hover:bg-yellow-500 dark:bg-yellow-500 dark:hover:bg-yellow-400 text-black font-bold px-5 py-3 rounded-full transition-colors flex items-center gap-2 shadow-sm shrink-0"
+            >
+              <ArrowRight size={18} />
+            </button>
+          </div>
+
+          <div className="mt-4 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <ShieldCheck size={14} className="text-emerald-500" />
+            <span>Verified drivers available nearby</span>
+          </div>
         </div>
       </section>
 

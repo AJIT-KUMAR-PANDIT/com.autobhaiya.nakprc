@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import csvUrl from "../assets/data.autobhaiya.nakprc.csv?url";
-import { ShieldCheck, Star, MessageCircle } from "lucide-react";
+import { ShieldCheck, Star, MessageCircle, MapPin, Navigation } from "lucide-react";
 
 export default function SearchResultsPage() {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
+  const goAnywhere = searchParams.get("go-anywhere") || "";
+  const isGoAnywhere = !!goAnywhere;
   const navigate = useNavigate();
 
   const [schoolRides, setSchoolRides] = useState([]);
@@ -62,7 +64,10 @@ export default function SearchResultsPage() {
 
   // Filter Logic
   useEffect(() => {
-    if (searchTerm.trim() === "") {
+    if (isGoAnywhere) {
+      // For go-anywhere, show all available drivers
+      setFilteredRides(schoolRides);
+    } else if (searchTerm.trim() === "") {
       setFilteredRides([]);
     } else {
       const lowerQuery = searchTerm.toLowerCase();
@@ -74,7 +79,7 @@ export default function SearchResultsPage() {
       );
       setFilteredRides(filtered);
     }
-  }, [searchTerm, schoolRides]);
+  }, [searchTerm, schoolRides, isGoAnywhere]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -89,7 +94,9 @@ export default function SearchResultsPage() {
           <button onClick={() => navigate(-1)} className="text-2xl">
             ←
           </button>
-          <h1 className="text-lg font-bold">Search Results</h1>
+          <h1 className="text-lg font-bold">
+            {isGoAnywhere ? "Nearby Bhaiyas for Your Trip" : "Search Results"}
+          </h1>
         </div>
         <form onSubmit={handleSearch} className="relative">
           <input
@@ -111,7 +118,21 @@ export default function SearchResultsPage() {
 
       {/* Results List */}
       <div className="px-6 py-4 space-y-4">
-        {searchTerm && (
+        {isGoAnywhere && (
+          <div className="flex items-center gap-2 bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-700/30 rounded-full px-4 py-2.5">
+            <MapPin size={16} className="text-yellow-600 dark:text-yellow-400" />
+            <span className="text-sm font-semibold text-yellow-700 dark:text-yellow-300 truncate">
+              Going to: {goAnywhere}
+            </span>
+            <button
+              onClick={() => navigate("/")}
+              className="ml-auto text-xs font-bold text-yellow-600 dark:text-yellow-400 hover:text-yellow-700 shrink-0"
+            >
+              Clear
+            </button>
+          </div>
+        )}
+        {searchTerm && !isGoAnywhere && (
           <p className="text-sm text-gray-500 font-medium">
             Showing results for "{searchTerm}"
           </p>
@@ -164,9 +185,9 @@ export default function SearchResultsPage() {
               <div className="mt-5 flex gap-3">
                 <button
                   onClick={() => navigate(`/auto-bhaiya/${ride.autoNumber}`)}
-                  className="flex-1 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-3.5 rounded-full text-sm transition-colors shadow-sm flex items-center justify-center gap-2"
+                  className={`flex-1 ${isGoAnywhere ? "bg-yellow-400 hover:bg-yellow-500 text-gray-900" : "bg-yellow-400 hover:bg-yellow-500 text-gray-900"} font-bold py-3.5 rounded-full text-sm transition-colors shadow-sm flex items-center justify-center gap-2`}
                 >
-                  Book for School
+                  {isGoAnywhere ? "Book Trip" : "Book for School"}
                 </button>
                 <button className="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-colors">
                   <MessageCircle size={20} />
@@ -176,8 +197,12 @@ export default function SearchResultsPage() {
           ))
         ) : (
           <div className="text-center py-12 text-gray-500 flex flex-col items-center gap-3">
-            <span className="text-4xl">🤔</span>
-            <p>No rides found matching "{searchTerm}"</p>
+            <span className="text-4xl">{isGoAnywhere ? "📍" : "🤔"}</span>
+            <p className="font-medium">
+              {isGoAnywhere
+                ? "We found verified drivers nearby. Try selecting one below!"
+                : `No rides found matching "${searchTerm}"`}
+            </p>
           </div>
         )}
       </div>
