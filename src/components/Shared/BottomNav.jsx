@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, Search, QrCode, Keyboard, History, Wallet, User, Grid3x3 } from "lucide-react";
+import { Home, Search, QrCode, Keyboard, History, Wallet, User, Grid3x3, MessageCircle } from "lucide-react";
 
 export default function BottomNav() {
   const { pathname } = useLocation();
@@ -105,7 +105,7 @@ export default function BottomNav() {
           }`}>
             <Link to={chatLink} onClick={() => setIsMenuOpen(false)} className="flex flex-col items-center gap-1.5 group">
               <div className={`w-12 h-12 rounded-full bg-white dark:bg-card-dark shadow-xl border border-gray-100 dark:border-gray-800 flex items-center justify-center text-gray-700 dark:text-gray-200 transition-transform group-hover:scale-110 group-active:scale-95 relative`}>
-                <Search size={20} />
+                <MessageCircle size={20} />
               </div>
               <span className="text-[10px] font-bold text-gray-800 dark:text-white bg-white/90 dark:bg-black/70 px-2.5 py-1 rounded-full backdrop-blur-md shadow-sm">Chat</span>
             </Link>
