@@ -12,6 +12,7 @@ import WebLanding from "@/pages/WebLanding";
 import SearchResultsPage from "@/pages/SearchResults";
 import HistoryPage from "@/pages/History";
 import ScannerPage from "@/pages/Scanner";
+import ChatPage from "@/pages/ChatPage";
 import "./App.css";
 
 function App() {
@@ -57,6 +58,7 @@ function App() {
             path="/auto-bhaiya/:vNumber/profile"
             element={<ProfilePage />}
           />
+          <Route path="/chat" element={<ChatPage />} />
         </Routes>
       </div>
       {!isWebLanding && <BottomNav />}

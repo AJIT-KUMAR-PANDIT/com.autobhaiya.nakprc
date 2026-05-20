@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import csvUrl from "../assets/data.autobhaiya.nakprc.csv?url";
-import { ShieldCheck, Star, MessageCircle, MapPin, Navigation } from "lucide-react";
+import { ShieldCheck, Star, MapPin, MessageCircle } from "lucide-react";
 
 export default function SearchResultsPage() {
   const [searchParams] = useSearchParams();
@@ -54,6 +54,7 @@ export default function SearchResultsPage() {
               serviceDate: cols[5],
               schoolName: cols[6]?.trim(),
               mapsUrl: cols[7]?.trim(),
+              whatsappNumber: cols[8]?.replace(/"/g, "").trim(),
             };
           })
           .filter((item) => item !== null);
@@ -65,7 +66,6 @@ export default function SearchResultsPage() {
   // Filter Logic
   useEffect(() => {
     if (isGoAnywhere) {
-      // For go-anywhere, show all available drivers
       setFilteredRides(schoolRides);
     } else if (searchTerm.trim() === "") {
       setFilteredRides([]);
@@ -86,8 +86,15 @@ export default function SearchResultsPage() {
     navigate(`/search?q=${searchTerm}`);
   };
 
+  const openChat = (driver) => {
+    const msg = encodeURIComponent(
+      `Hi, I found you on search. I need a trip from my location.`
+    );
+    navigate(`/chat?message=${msg}&driver=${encodeURIComponent(driver.driverName || "")}`);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 pb-32">
+    <div className="min-h-screen bg-gray-50 pb-24">
       {/* Header with Search Bar */}
       <div className="sticky top-0 z-50 bg-white shadow-sm px-6 py-4">
         <div className="flex items-center gap-3 mb-2">
@@ -189,7 +196,10 @@ export default function SearchResultsPage() {
                 >
                   {isGoAnywhere ? "Book Trip" : "Book for School"}
                 </button>
-                <button className="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-colors">
+                <button
+                  onClick={() => openChat(ride)}
+                  className="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 hover:text-emerald-600 transition-colors"
+                >
                   <MessageCircle size={20} />
                 </button>
               </div>
