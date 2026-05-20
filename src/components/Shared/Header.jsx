@@ -1,7 +1,9 @@
-import React from "react";
-import { Menu, BadgeCheck } from "lucide-react";
+import { BadgeCheck } from "lucide-react";
 
 export default function Header() {
+  const vNumber = typeof window !== "undefined" ? localStorage.getItem("currentVNumber") : null;
+  const profileLink = vNumber ? `/auto-bhaiya/${vNumber}/profile` : "/";
+
   return (
     <header className="sticky top-0 z-20 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm px-4 pt-2 pb-0.5 border-b border-gray-100 dark:border-gray-800">
       <div className="flex items-center justify-between">
@@ -25,8 +27,11 @@ export default function Header() {
             </div>
           </div>
         </a>
-        {/* Hamburger Menu */}
-        <div className="flex items-center gap-3 bg-white dark:bg-card-dark rounded-full pl-3 pr-1 py-1 shadow-sm border border-gray-100 dark:border-gray-700">
+        {/* Driver Profile — visible in header */}
+        <a
+          href={profileLink}
+          className="flex items-center gap-3 bg-white dark:bg-card-dark rounded-full pl-3 pr-1 py-1 shadow-sm border border-gray-100 dark:border-gray-700"
+        >
           <div className="flex flex-col items-end mr-1">
             <span className="text-xs font-bold text-text-main dark:text-white leading-none">
               Bablu
@@ -38,13 +43,15 @@ export default function Header() {
               </span>
             </div>
           </div>
-          <button
-            className="h-9 w-9 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-            aria-label="Open menu"
-          >
-            <Menu className="w-[18px] h-[18px] text-gray-700 dark:text-gray-300" />
-          </button>
-        </div>
+          <div
+            className="h-9 w-9 rounded-full bg-gray-200 bg-cover bg-center border-2 border-primary"
+            style={{
+              backgroundImage:
+                "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCzalvMLs15yELe2VKcy0IIBLIQ01G2BssTuWl8bbpad-hc1xZ4ft_ORVdRV772nEd6PQzGYc3shwYLJPnlEEkEmpZXP2sEYBYnnm3GpHquAsztaHLERZgvVA8_9tBlnI4FfLkol4adZnUHiNmV88gx7EPkn4NQ9f8aZL4tnnNilmxbTpvSEEFz5l_3_xMp8KeX6IzWa2p-oTWYw5LQV91ga8H6-O7w2F0HkmeZb696g6NDUNRCWjhTC7Nk7bdE_WXqH77ahusaSvE')",
+            }}
+            aria-label="Profile"
+          ></div>
+        </a>
       </div>
     </header>
   );

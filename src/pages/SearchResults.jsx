@@ -86,11 +86,8 @@ export default function SearchResultsPage() {
     navigate(`/search?q=${searchTerm}`);
   };
 
-  const openChat = (driver) => {
-    const msg = encodeURIComponent(
-      `Hi, I found you on search. I need a trip from my location.`
-    );
-    navigate(`/chat?message=${msg}&driver=${encodeURIComponent(driver.driverName || "")}`);
+  const openChat = () => {
+    navigate("/chat?message=Hi, I found you on search. I need a trip from my location.");
   };
 
   return (
@@ -197,7 +194,7 @@ export default function SearchResultsPage() {
                   {isGoAnywhere ? "Book Trip" : "Book for School"}
                 </button>
                 <button
-                  onClick={() => openChat(ride)}
+                  onClick={openChat}
                   className="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 hover:text-emerald-600 transition-colors"
                 >
                   <MessageCircle size={20} />
