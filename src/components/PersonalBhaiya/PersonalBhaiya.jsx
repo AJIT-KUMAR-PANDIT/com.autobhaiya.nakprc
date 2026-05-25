@@ -116,6 +116,13 @@ export default function PersonalBhaiya() {
 
   const selectedDriver = schoolRides.find((r) => r.autoNumber === plateNumber);
 
+  // Redirect to 404 when the auto number is not found in the CSV
+  useEffect(() => {
+    if (vNumber && schoolRides.length > 0 && !selectedDriver) {
+      navigate("/auto-bhaiya/not-found");
+    }
+  }, [vNumber, schoolRides, selectedDriver, navigate]);
+
   const driver = selectedDriver
     ? {
         name: selectedDriver.driverName,

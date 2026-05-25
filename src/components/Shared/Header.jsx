@@ -1,4 +1,5 @@
 import { BadgeCheck } from "lucide-react";
+import { Show, SignInButton, SignUpButton, UserButton } from "@clerk/react";
 
 export default function Header() {
   const vNumber = typeof window !== "undefined" ? localStorage.getItem("currentVNumber") : null;
@@ -27,31 +28,20 @@ export default function Header() {
             </div>
           </div>
         </a>
-        {/* Driver Profile — visible in header */}
-        <a
-          href={profileLink}
-          className="flex items-center gap-3 bg-white dark:bg-card-dark rounded-full pl-3 pr-1 py-1 shadow-sm border border-gray-100 dark:border-gray-700"
-        >
-          <div className="flex flex-col items-end mr-1">
-            <span className="text-xs font-bold text-text-main dark:text-white leading-none">
-              Bablu
-            </span>
-            <div className="flex items-center gap-1 mt-0.5">
-              <BadgeCheck className="text-primary w-[14px] h-[14px]" />
-              <span className="text-[10px] font-medium text-primary uppercase tracking-wide">
-                Verified
-              </span>
-            </div>
-          </div>
-          <div
-            className="h-9 w-9 rounded-full bg-gray-200 bg-cover bg-center border-2 border-primary"
-            style={{
-              backgroundImage:
-                "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCzalvMLs15yELe2VKcy0IIBLIQ01G2BssTuWl8bbpad-hc1xZ4ft_ORVdRV772nEd6PQzGYc3shwYLJPnlEEkEmpZXP2sEYBYnnm3GpHquAsztaHLERZgvVA8_9tBlnI4FfLkol4adZnUHiNmV88gx7EPkn4NQ9f8aZL4tnnNilmxbTpvSEEFz5l_3_xMp8KeX6IzWa2p-oTWYw5LQV91ga8H6-O7w2F0HkmeZb696g6NDUNRCWjhTC7Nk7bdE_WXqH77ahusaSvE')",
-            }}
-            aria-label="Profile"
-          ></div>
-        </a>
+        {/* Clerk Auth / Profile */}
+        <div className="flex items-center gap-2">
+          <Show when="signed-out">
+            <SignInButton mode="modal">
+              <button className="text-sm font-medium text-primary hover:underline">Sign In</button>
+            </SignInButton>
+            <SignUpButton mode="modal">
+              <button className="text-sm font-medium bg-primary text-white px-3 py-1 rounded-full hover:bg-primary-dark">Sign Up</button>
+            </SignUpButton>
+          </Show>
+          <Show when="signed-in">
+            <UserButton afterSignOutUrl="/" />
+          </Show>
+        </div>
       </div>
     </header>
   );

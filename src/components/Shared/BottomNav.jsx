@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, Search, QrCode, Keyboard, History, Wallet, User, Grid3x3, MessageCircle } from "lucide-react";
+import { Home, Search, QrCode, Keyboard, History, Wallet, User, Grid3x3, MessageCircle, LogIn } from "lucide-react";
+import { Show, SignInButton } from "@clerk/react";
 
 export default function BottomNav() {
   const { pathname } = useLocation();
@@ -117,10 +118,20 @@ export default function BottomNav() {
               <div className={menuItemBtn}><Wallet size={20} /></div>
               <span className={menuItemLabel}>Payments</span>
             </Link>
-            <Link to={profileLink} onClick={() => setIsMenuOpen(false)} className="flex flex-col items-center gap-1.5 group">
-              <div className={menuItemBtn}><User size={20} /></div>
-              <span className={menuItemLabel}>Profile</span>
-            </Link>
+            <Show when="signed-out">
+              <div className="flex flex-col items-center gap-1.5 group">
+                <SignInButton mode="modal">
+                  <div className={menuItemBtn}><LogIn size={20} /></div>
+                </SignInButton>
+                <span className={menuItemLabel}>Login</span>
+              </div>
+            </Show>
+            <Show when="signed-in">
+              <Link to={profileLink} onClick={() => setIsMenuOpen(false)} className="flex flex-col items-center gap-1.5 group">
+                <div className={menuItemBtn}><User size={20} /></div>
+                <span className={menuItemLabel}>Profile</span>
+              </Link>
+            </Show>
           </div>
         </div>
       </div>

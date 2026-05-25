@@ -13,6 +13,9 @@ import SearchResultsPage from "@/pages/SearchResults";
 import HistoryPage from "@/pages/History";
 import ScannerPage from "@/pages/Scanner";
 import ChatPage from "@/pages/ChatPage";
+import NotFound from "@/pages/NotFound";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import TermsOfService from "@/pages/TermsOfService";
 import "./App.css";
 
 function App() {
@@ -30,19 +33,25 @@ function App() {
     return <Loader />;
   }
 
-  // Do not show Header/BottomNav on the marketing WebLanding page
-  const isWebLanding = location.pathname === "/";
+  // Do not show Header/BottomNav on these pages
+  const hideNavigation = [
+    "/",
+    "/privacy-policy",
+    "/terms-of-service"
+  ].includes(location.pathname);
 
   return (
     <>
-      {!isWebLanding && <Header />}
-      <div className={!isWebLanding ? "pb-24 mb-44 pt-[10px]" : "pb-0 mb-0"}>
+      {!hideNavigation && <Header />}
+      <div className={!hideNavigation ? "pb-24 mb-44 pt-[10px]" : "pb-0 mb-0"}>
         <Routes>
           <Route path="/" element={<WebLanding />} />
           <Route path="/app" element={<LandingPage />} />
           <Route path="/search" element={<SearchResultsPage />} />
           <Route path="/history" element={<HistoryPage />} />
           <Route path="/scan" element={<ScannerPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
           {/* <Route path="/payments" element={<PaymentsPage />} /> */}
           {/* <Route path="/profile" element={<ProfilePage />} /> */}
           {/* <Route path="/auto-bhaiya" element={<PersonalBhaiyaPage />} /> */}
@@ -59,9 +68,10 @@ function App() {
             element={<ProfilePage />}
           />
           <Route path="/chat" element={<ChatPage />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
-      {!isWebLanding && <BottomNav />}
+      {!hideNavigation && <BottomNav />}
     </>
   );
 }
