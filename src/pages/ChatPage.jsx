@@ -181,21 +181,19 @@ export default function ChatPage() {
   const [searchParams] = useSearchParams();
   const prefillMessage = searchParams.get("message") || "";
 
-  const [activeContact, setActiveContact] = useState(null);
-  const [allChats, setAllChats] = useState(loadChats);
-
-  // Auto-open the first contact and send prefill message
-  useEffect(() => {
-    if (prefillMessage && !activeContact) {
+  const [activeContact, setActiveContact] = useState(() => (prefillMessage ? CONTACTS[0] : null));
+  const [allChats, setAllChats] = useState(() => {
+    const loaded = loadChats();
+    if (prefillMessage) {
       const target = CONTACTS[0];
-      setActiveContact(target);
-      const contactChats = allChats[target.id] || [];
+      const contactChats = loaded[target.id] || [];
       const newMsg = { id: generateId(), text: prefillMessage, sender: "me", time: Date.now(), status: "sent" };
-      const updated = { ...allChats, [target.id]: [...contactChats, newMsg] };
-      setAllChats(updated);
+      const updated = { ...loaded, [target.id]: [...contactChats, newMsg] };
       saveChats(updated);
+      return updated;
     }
-  }, [prefillMessage]);
+    return loaded;
+  });
 
   const getMessages = (contactId) => allChats[contactId] || [];
 

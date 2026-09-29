@@ -30,7 +30,6 @@ export default function PersonalBhaiya() {
 
   useEffect(() => {
     if (vNumber) {
-      setPlateNumber(vNumber);
       localStorage.setItem("currentVNumber", vNumber);
     }
   }, [vNumber]);

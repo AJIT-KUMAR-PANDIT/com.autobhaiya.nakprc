@@ -1,21 +1,22 @@
 import { useState, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import HomePage from "@/pages/Home";
-import PaymentsPage from "@/pages/Payments";
-import ProfilePage from "@/pages/Profile";
+import SearchResultsPage from "@/pages/SearchResults";
+import VerifyPage from "@/pages/Verify";
+import AutoDetails from "@/pages/AutoDetails";
+import BookingPage from "@/pages/Booking";
+import TrackingPage from "@/pages/Tracking";
+import PaymentPage from "@/pages/Payment";
+import BookingsListPage from "@/pages/BookingsList";
+import ScannerPage from "@/pages/Scanner";
+import ChatPage from "@/pages/ChatPage";
+import WebLanding from "@/pages/WebLanding";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import TermsOfService from "@/pages/TermsOfService";
+import NotFound from "@/pages/NotFound";
 import Header from "@/components/Shared/Header";
 import BottomNav from "@/components/Shared/BottomNav";
 import Loader from "@/components/Shared/Loader";
-import PersonalBhaiyaPage from "@/pages/PersonalBhaiya";
-import LandingPage from "@/pages/Landing";
-import WebLanding from "@/pages/WebLanding";
-import SearchResultsPage from "@/pages/SearchResults";
-import HistoryPage from "@/pages/History";
-import ScannerPage from "@/pages/Scanner";
-import ChatPage from "@/pages/ChatPage";
-import NotFound from "@/pages/NotFound";
-import PrivacyPolicy from "@/pages/PrivacyPolicy";
-import TermsOfService from "@/pages/TermsOfService";
 import "./App.css";
 
 function App() {
@@ -25,7 +26,7 @@ function App() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 600); // quick smooth loader
     return () => clearTimeout(timer);
   }, []);
 
@@ -33,46 +34,59 @@ function App() {
     return <Loader />;
   }
 
-  // Do not show Header/BottomNav on these pages
+  // Hide top/bottom chrome on standalone marketing or legal pages
   const hideNavigation = [
-    "/",
+    "/web",
     "/privacy-policy",
     "/terms-of-service"
   ].includes(location.pathname);
 
+  // Full-bleed scanner
+  const isScanner = location.pathname === "/scan";
+
   return (
-    <>
-      {!hideNavigation && <Header />}
-      <div className={!hideNavigation ? "pb-24 mb-44 pt-[10px]" : "pb-0 mb-0"}>
+    <div className="min-h-screen bg-gray-50 flex flex-col font-sans selection:bg-amber-400 selection:text-black">
+      {!hideNavigation && !isScanner && <Header />}
+
+      <main className="flex-1">
         <Routes>
-          <Route path="/" element={<WebLanding />} />
-          <Route path="/app" element={<LandingPage />} />
+          {/* Main App Routes */}
+          <Route path="/" element={<HomePage />} />
+          <Route path="/app" element={<HomePage />} />
           <Route path="/search" element={<SearchResultsPage />} />
-          <Route path="/history" element={<HistoryPage />} />
+          <Route path="/verify" element={<VerifyPage />} />
+
+          {/* Auto Details */}
+          <Route path="/auto/:id" element={<AutoDetails />} />
+          <Route path="/auto-bhaiya/:id" element={<AutoDetails />} />
+
+          {/* Booking & Tracking & Payment Journey */}
+          <Route path="/booking/:id" element={<BookingPage />} />
+          <Route path="/tracking/:id" element={<TrackingPage />} />
+          <Route path="/payment/:id" element={<PaymentPage />} />
+
+          {/* Bookings & History */}
+          <Route path="/bookings" element={<BookingsListPage />} />
+          <Route path="/history" element={<BookingsListPage />} />
+
+          {/* QR Scanner */}
           <Route path="/scan" element={<ScannerPage />} />
+
+          {/* Chat & Support */}
+          <Route path="/chat" element={<ChatPage />} />
+
+          {/* Marketing & Legal */}
+          <Route path="/web" element={<WebLanding />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
-          {/* <Route path="/payments" element={<PaymentsPage />} /> */}
-          {/* <Route path="/profile" element={<ProfilePage />} /> */}
-          {/* <Route path="/auto-bhaiya" element={<PersonalBhaiyaPage />} /> */}
-          <Route
-            path="/auto-bhaiya/:vNumber"
-            element={<PersonalBhaiyaPage />}
-          />
-          <Route
-            path="/auto-bhaiya/:vNumber/payments"
-            element={<PaymentsPage />}
-          />
-          <Route
-            path="/auto-bhaiya/:vNumber/profile"
-            element={<ProfilePage />}
-          />
-          <Route path="/chat" element={<ChatPage />} />
+
+          {/* 404 Fallback */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </div>
-      {!hideNavigation && <BottomNav />}
-    </>
+      </main>
+
+      {!hideNavigation && !isScanner && <BottomNav />}
+    </div>
   );
 }
 

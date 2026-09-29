@@ -1,21 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ShieldCheck, Star, MessageCircle, ArrowLeft } from "lucide-react";
 
 export default function HistoryPage() {
   const navigate = useNavigate();
-  const [historyItems, setHistoryItems] = useState([]);
-
-  useEffect(() => {
+  const [historyItems] = useState(() => {
     try {
-      const historyJson = localStorage.getItem("searchHistory");
-      if (historyJson) {
-        setHistoryItems(JSON.parse(historyJson));
-      }
+      const historyJson = typeof window !== "undefined" ? localStorage.getItem("searchHistory") : null;
+      return historyJson ? JSON.parse(historyJson) : [];
     } catch (e) {
       console.error("Could not load history", e);
+      return [];
     }
-  }, []);
+  });
 
   return (
     <div className="min-h-screen bg-gray-50 pb-32">

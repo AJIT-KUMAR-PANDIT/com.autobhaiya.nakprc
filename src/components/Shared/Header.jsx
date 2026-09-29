@@ -1,46 +1,35 @@
-import { BadgeCheck } from "lucide-react";
-import { Show, SignInButton, SignUpButton, UserButton } from "@clerk/react";
+import React from "react";
+import { Link } from "react-router-dom";
 
 export default function Header() {
-  const vNumber = typeof window !== "undefined" ? localStorage.getItem("currentVNumber") : null;
-  const profileLink = vNumber ? `/auto-bhaiya/${vNumber}/profile` : "/";
-
   return (
-    <header className="sticky top-0 z-20 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm px-4 pt-2 pb-0.5 border-b border-gray-100 dark:border-gray-800">
-      <div className="flex items-center justify-between">
-        {/* Brand */}
-        <a href="/">
-          <div className="flex items-center gap-2">
-            <div className="h-21 w-21">
-              <img
-                src="/logo.png"
-                alt="Auto Bhaiya Logo"
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <div className="flex flex-col">
-              <h1 className="text-xl font-bold tracking-tight text-text-main dark:text-white">
-                Auto Bhaiya
-              </h1>
-              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                Partner App
-              </span>
-            </div>
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-[0_1px_3px_rgba(0,0,0,0.02)] transition-all">
+      <div className="max-w-md mx-auto px-4 h-14 flex items-center justify-between">
+        {/* Logo-only top navigation */}
+        <Link
+          to="/"
+          className="flex items-center gap-2 group transition-transform active:scale-95"
+          aria-label="Auto Bhaiya Home"
+        >
+          <img
+            src="/logo.png"
+            alt="Auto Bhaiya Logo"
+            className="h-10 w-10 object-contain drop-shadow-sm"
+          />
+          <div className="flex flex-col">
+            <span className="font-extrabold text-base tracking-tight text-gray-900 leading-none">
+              Auto Bhaiya
+            </span>
+            <span className="text-[10px] font-semibold text-emerald-700 tracking-wider uppercase mt-0.5">
+              Verified Mobility
+            </span>
           </div>
-        </a>
-        {/* Clerk Auth / Profile */}
-        <div className="flex items-center gap-2">
-          <Show when="signed-out">
-            <SignInButton mode="modal">
-              <button className="text-sm font-medium text-primary hover:underline">Sign In</button>
-            </SignInButton>
-            <SignUpButton mode="modal">
-              <button className="text-sm font-medium bg-primary text-white px-3 py-1 rounded-full hover:bg-primary-dark">Sign Up</button>
-            </SignUpButton>
-          </Show>
-          <Show when="signed-in">
-            <UserButton afterSignOutUrl="/" />
-          </Show>
+        </Link>
+
+        {/* Subtle city indicator */}
+        <div className="flex items-center gap-1.5 bg-gray-50 border border-gray-200/70 rounded-full px-2.5 py-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-[11px] font-bold text-gray-600">Jamshedpur</span>
         </div>
       </div>
     </header>

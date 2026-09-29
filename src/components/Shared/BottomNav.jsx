@@ -1,139 +1,127 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, Search, QrCode, Keyboard, History, Wallet, User, Grid3x3, MessageCircle, LogIn } from "lucide-react";
-import { Show, SignInButton } from "@clerk/react";
+import { Home, Search, ShieldCheck, Clock3, QrCode } from "lucide-react";
 
 export default function BottomNav() {
   const { pathname } = useLocation();
-  const [isSearchMenuOpen, setIsSearchMenuOpen] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Extract vNumber from pathname e.g., /auto-bhaiya/DL1C5678
-  const match = pathname.match(/\/auto-bhaiya\/([^/]+)/);
-  const pathVNumber = match ? match[1] : null;
-
-  // Use pathVNumber, or fallback to localStorage
-  const vNumber = pathVNumber || (typeof window !== "undefined" ? localStorage.getItem("currentVNumber") : null);
-
-  // Build the correct links dynamically depending on context
-  const homeLink = vNumber ? `/auto-bhaiya/${vNumber}` : "/";
-  const searchLink = "/search";
-  const historyLink = "/history";
-  const paymentsLink = vNumber ? `/auto-bhaiya/${vNumber}/payments` : "/";
-  const profileLink = vNumber ? `/auto-bhaiya/${vNumber}/profile` : "/";
-  const chatLink = "/chat";
-
-  // Check which link is active
-  const isHomeActive = pathname === homeLink || pathname === "/";
-  const isSearchActive = pathname.includes("/search");
-
-  // Common menu button styles
-  const menuItemBtn =
-    "w-12 h-12 rounded-full bg-white dark:bg-card-dark shadow-xl border border-gray-100 dark:border-gray-800 flex items-center justify-center text-gray-700 dark:text-gray-200 transition-transform group-hover:scale-110 group-active:scale-95";
-  const menuItemLabel =
-    "text-[10px] font-bold text-gray-800 dark:text-white bg-white/90 dark:bg-black/70 px-2.5 py-1 rounded-full backdrop-blur-md shadow-sm";
+  const isHome = pathname === "/" || pathname === "/app";
+  const isVerify = pathname.startsWith("/verify");
+  const isSearch = pathname.startsWith("/search");
+  const isBookings =
+    pathname.startsWith("/bookings") ||
+    pathname.startsWith("/history") ||
+    pathname.startsWith("/tracking");
+  const isScan = pathname.startsWith("/scan");
 
   return (
-    <nav className="fixed bottom-0 left-0 w-full bg-white dark:bg-card-dark border-t border-gray-100 dark:border-gray-800 pb-[env(safe-area-inset-bottom)] pt-2 px-4 z-50 h-[80px]">
-      <div className="flex justify-between items-center h-full pb-4">
-        {/* Home */}
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-gray-200/80 shadow-[0_-4px_24px_rgba(0,0,0,0.06)] pb-[env(safe-area-inset-bottom)]"
+      role="navigation"
+      aria-label="Bottom Navigation"
+    >
+      <div className="max-w-md mx-auto h-[64px] px-2 flex items-center justify-around relative">
+        {/* 1. Home */}
         <Link
-          className={`flex flex-col items-center gap-1 w-14 transition-colors ${isHomeActive ? "text-primary dark:text-primary" : "text-gray-400 hover:text-text-main dark:hover:text-white"}`}
-          to={homeLink}
+          to="/"
+          className={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
+            isHome
+              ? "text-emerald-700 font-bold"
+              : "text-gray-500 hover:text-gray-900 font-medium"
+          }`}
+          aria-label="Home"
         >
-          <Home className={`w-[24px] h-[24px] ${isHomeActive ? "fill-current" : ""}`} />
-          <span className="text-[10px] font-medium">Home</span>
+          <div className="relative">
+            <Home size={22} strokeWidth={isHome ? 2.5 : 1.8} />
+            {isHome && (
+              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-emerald-600" />
+            )}
+          </div>
+          <span className="text-[11px] mt-1 leading-tight">Home</span>
         </Link>
 
-        {/* Center Search Button (heatmap glow) */}
-        <div className="relative -top-5 flex justify-center w-16">
-          <button
-            onClick={() => setIsSearchMenuOpen(!isSearchMenuOpen)}
-            className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-transform active:scale-95 z-20 relative ${
-              isSearchActive || isSearchMenuOpen
-                ? "bg-primary text-white shadow-primary/40 ring-4 ring-primary/20"
-                : "bg-gray-900 text-white dark:bg-white dark:text-gray-900 shadow-gray-900/20"
-            }`}
-          >
-            <Search className={`w-[24px] h-[24px] transition-transform duration-300 ${isSearchMenuOpen ? "rotate-90 scale-110" : ""}`} strokeWidth={2.5} />
-          </button>
-
-          {/* Search Popup Menu Overlay */}
-          {isSearchMenuOpen && (
-            <div className="fixed inset-0 z-10 bg-black/5 backdrop-blur-[1px]" onClick={() => setIsSearchMenuOpen(false)} />
-          )}
-
-          {/* Search Popup Items */}
-          <div className={`absolute bottom-16 flex items-center gap-4 transition-all duration-300 z-20 ${
-            isSearchMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8 pointer-events-none"
-          }`}>
-            <Link to="/scan" onClick={() => setIsSearchMenuOpen(false)} className="flex flex-col items-center gap-1.5 group">
-              <div className={menuItemBtn}><QrCode size={20} /></div>
-              <span className={menuItemLabel}>Scanner</span>
-            </Link>
-            <Link to={searchLink} onClick={() => setIsSearchMenuOpen(false)} className="flex flex-col items-center gap-1.5 group">
-              <div className={menuItemBtn}><Keyboard size={20} /></div>
-              <span className={menuItemLabel}>Type Search</span>
-            </Link>
+        {/* 2. Verify */}
+        <Link
+          to="/verify"
+          className={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
+            isVerify
+              ? "text-emerald-700 font-bold"
+              : "text-gray-500 hover:text-gray-900 font-medium"
+          }`}
+          aria-label="Verify Auto"
+        >
+          <div className="relative">
+            <ShieldCheck size={22} strokeWidth={isVerify ? 2.5 : 1.8} />
+            {isVerify && (
+              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-emerald-600" />
+            )}
           </div>
-        </div>
+          <span className="text-[11px] mt-1 leading-tight">Verify</span>
+        </Link>
 
-        {/* Hamburger Menu — all removed items */}
-        <div className="relative">
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="flex flex-col items-center gap-1 w-14 text-gray-400 hover:text-text-main dark:hover:text-white transition-colors active:scale-95"
-            aria-label="More options"
+        {/* 3. CENTER SEARCH ACTION (Visually elevated) */}
+        <div className="flex-1 flex justify-center -mt-6">
+          <Link
+            to="/search"
+            className="flex flex-col items-center group active:scale-95 transition-transform"
+            aria-label="Search Auto"
           >
-            <div className="relative">
-              <Grid3x3 className="w-[24px] h-[24px]" />
-              {/* Unread indicator if on home */}
-              {!isMenuOpen && (
-                <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-primary rounded-full border-2 border-white dark:border-card-dark" />
-              )}
+            <div
+              className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg border-3 border-white transition-all ${
+                isSearch
+                  ? "bg-emerald-600 text-white shadow-emerald-500/40 ring-4 ring-emerald-400/20"
+                  : "bg-gradient-to-tr from-amber-400 to-yellow-300 text-gray-950 shadow-amber-500/30 group-hover:shadow-amber-500/50"
+              }`}
+            >
+              <Search size={24} strokeWidth={2.6} />
             </div>
-            <span className="text-[10px] font-medium">More</span>
-          </button>
-
-          {/* Menu Popup Overlay */}
-          {isMenuOpen && (
-            <div className="fixed inset-0 z-40 bg-black/5" onClick={() => setIsMenuOpen(false)} />
-          )}
-
-          {/* Menu Popup Items */}
-          <div className={`absolute bottom-16 right-0 flex items-center gap-4 transition-all duration-300 z-50 ${
-            isMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8 pointer-events-none"
-          }`}>
-            <Link to={chatLink} onClick={() => setIsMenuOpen(false)} className="flex flex-col items-center gap-1.5 group">
-              <div className={`w-12 h-12 rounded-full bg-white dark:bg-card-dark shadow-xl border border-gray-100 dark:border-gray-800 flex items-center justify-center text-gray-700 dark:text-gray-200 transition-transform group-hover:scale-110 group-active:scale-95 relative`}>
-                <MessageCircle size={20} />
-              </div>
-              <span className="text-[10px] font-bold text-gray-800 dark:text-white bg-white/90 dark:bg-black/70 px-2.5 py-1 rounded-full backdrop-blur-md shadow-sm">Chat</span>
-            </Link>
-            <Link to={historyLink} onClick={() => setIsMenuOpen(false)} className="flex flex-col items-center gap-1.5 group">
-              <div className={menuItemBtn}><History size={20} /></div>
-              <span className={menuItemLabel}>History</span>
-            </Link>
-            <Link to={paymentsLink} onClick={() => setIsMenuOpen(false)} className="flex flex-col items-center gap-1.5 group">
-              <div className={menuItemBtn}><Wallet size={20} /></div>
-              <span className={menuItemLabel}>Payments</span>
-            </Link>
-            <Show when="signed-out">
-              <div className="flex flex-col items-center gap-1.5 group">
-                <SignInButton mode="modal">
-                  <div className={menuItemBtn}><LogIn size={20} /></div>
-                </SignInButton>
-                <span className={menuItemLabel}>Login</span>
-              </div>
-            </Show>
-            <Show when="signed-in">
-              <Link to={profileLink} onClick={() => setIsMenuOpen(false)} className="flex flex-col items-center gap-1.5 group">
-                <div className={menuItemBtn}><User size={20} /></div>
-                <span className={menuItemLabel}>Profile</span>
-              </Link>
-            </Show>
-          </div>
+            <span
+              className={`text-[10px] font-extrabold uppercase tracking-wider mt-1 ${
+                isSearch ? "text-emerald-700" : "text-gray-800"
+              }`}
+            >
+              Search
+            </span>
+          </Link>
         </div>
+
+        {/* 4. Bookings / Rides */}
+        <Link
+          to="/bookings"
+          className={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
+            isBookings
+              ? "text-emerald-700 font-bold"
+              : "text-gray-500 hover:text-gray-900 font-medium"
+          }`}
+          aria-label="Bookings"
+        >
+          <div className="relative">
+            <Clock3 size={22} strokeWidth={isBookings ? 2.5 : 1.8} />
+            {isBookings && (
+              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-emerald-600" />
+            )}
+          </div>
+          <span className="text-[11px] mt-1 leading-tight">Bookings</span>
+        </Link>
+
+        {/* 5. Scan QR */}
+        <Link
+          to="/scan"
+          className={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
+            isScan
+              ? "text-emerald-700 font-bold"
+              : "text-gray-500 hover:text-gray-900 font-medium"
+          }`}
+          aria-label="Scan QR"
+        >
+          <div className="relative">
+            <QrCode size={22} strokeWidth={isScan ? 2.5 : 1.8} />
+            {isScan && (
+              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-emerald-600" />
+            )}
+          </div>
+          <span className="text-[11px] mt-1 leading-tight">Scan QR</span>
+        </Link>
       </div>
     </nav>
   );

@@ -1,215 +1,197 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import csvUrl from "../assets/data.autobhaiya.nakprc.csv?url";
-import { ShieldCheck, Star, MapPin, MessageCircle } from "lucide-react";
+import { Search, ArrowLeft, X, Filter, Sparkles, MapPin } from "lucide-react";
+import AutoCard from "../components/Shared/AutoCard.jsx";
+import { searchAutos, getAutos } from "../data/autos.js";
+
+const FILTER_TAGS = [
+  "All",
+  "Available Now",
+  "Sakchi",
+  "Bistupur",
+  "Kadma",
+  "Sonari",
+  "Telco",
+  "CNG Auto",
+  "Electric Auto"
+];
 
 export default function SearchResultsPage() {
-  const [searchParams] = useSearchParams();
-  const query = searchParams.get("q") || "";
-  const goAnywhere = searchParams.get("go-anywhere") || "";
-  const isGoAnywhere = !!goAnywhere;
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const [schoolRides, setSchoolRides] = useState([]);
-  const [filteredRides, setFilteredRides] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(query);
+  const query = searchParams.get("q") || "";
+  const goAnywhere = searchParams.get("go-anywhere") || "";
+  const initialSearch = query || goAnywhere;
+
+  const [searchTerm, setSearchTerm] = useState(initialSearch);
+  const [selectedTag, setSelectedTag] = useState("All");
 
   useEffect(() => {
-    setSearchTerm(query);
-  }, [query]);
+    setSearchTerm(initialSearch);
+  }, [initialSearch]);
 
-  // Fetch Drivers Data
-  useEffect(() => {
-    fetch(csvUrl)
-      .then((response) => response.text())
-      .then((text) => {
-        const rows = text.split("\n").slice(1);
-        const parseLine = (line) => {
-          const result = [];
-          let start = 0;
-          let inQuotes = false;
-          for (let i = 0; i < line.length; i++) {
-            if (line[i] === '"') {
-              inQuotes = !inQuotes;
-            } else if (line[i] === "," && !inQuotes) {
-              result.push(line.substring(start, i));
-              start = i + 1;
-            }
-          }
-          result.push(line.substring(start));
-          return result;
-        };
+  const allAutos = useMemo(() => getAutos(), []);
 
-        const parsedData = rows
-          .map((row) => {
-            if (!row.trim()) return null;
-            const cols = parseLine(row);
-            if (cols.length < 8) return null;
-            return {
-              id: cols[0],
-              autoNumber: cols[1],
-              driverName: cols[2]?.replace(/"/g, "").trim(),
-              vehicleType: cols[3],
-              status: cols[4],
-              serviceDate: cols[5],
-              schoolName: cols[6]?.trim(),
-              mapsUrl: cols[7]?.trim(),
-              whatsappNumber: cols[8]?.replace(/"/g, "").trim(),
-            };
-          })
-          .filter((item) => item !== null);
-        setSchoolRides(parsedData);
-      })
-      .catch((err) => console.error("Error loading CSV:", err));
-  }, []);
+  // Filter autos based on searchTerm and selectedTag
+  const filteredAutos = useMemo(() => {
+    let list = searchTerm ? searchAutos(searchTerm) : allAutos;
 
-  // Filter Logic
-  useEffect(() => {
-    if (isGoAnywhere) {
-      setFilteredRides(schoolRides);
-    } else if (searchTerm.trim() === "") {
-      setFilteredRides([]);
-    } else {
-      const lowerQuery = searchTerm.toLowerCase();
-      const filtered = schoolRides.filter(
-        (ride) =>
-          ride.schoolName?.toLowerCase().includes(lowerQuery) ||
-          ride.autoNumber?.toLowerCase().includes(lowerQuery) ||
-          ride.driverName?.toLowerCase().includes(lowerQuery)
+    if (selectedTag === "Available Now") {
+      list = list.filter((a) => a.available);
+    } else if (selectedTag === "CNG Auto") {
+      list = list.filter((a) => a.vehicleType.toLowerCase().includes("cng"));
+    } else if (selectedTag === "Electric Auto") {
+      list = list.filter((a) => a.vehicleType.toLowerCase().includes("electric"));
+    } else if (selectedTag !== "All") {
+      list = list.filter(
+        (a) =>
+          a.area.toLowerCase() === selectedTag.toLowerCase() ||
+          a.destinationHints.some((d) => d.toLowerCase() === selectedTag.toLowerCase())
       );
-      setFilteredRides(filtered);
     }
-  }, [searchTerm, schoolRides, isGoAnywhere]);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    navigate(`/search?q=${searchTerm}`);
+    return list;
+  }, [searchTerm, selectedTag, allAutos]);
+
+  const handleSearchSubmit = (e) => {
+    e?.preventDefault();
+    if (searchTerm.trim()) {
+      setSearchParams({ q: searchTerm.trim() });
+    } else {
+      setSearchParams({});
+    }
   };
 
-  const openChat = () => {
-    navigate("/chat?message=Hi, I found you on search. I need a trip from my location.");
+  const clearSearch = () => {
+    setSearchTerm("");
+    setSearchParams({});
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      {/* Header with Search Bar */}
-      <div className="sticky top-0 z-50 bg-white shadow-sm px-6 py-4">
-        <div className="flex items-center gap-3 mb-2">
-          <button onClick={() => navigate(-1)} className="text-2xl">
-            ←
-          </button>
-          <h1 className="text-lg font-bold">
-            {isGoAnywhere ? "Nearby Bhaiyas for Your Trip" : "Search Results"}
-          </h1>
+    <div className="min-h-screen bg-gray-50 pb-32">
+      {/* Top Search Bar */}
+      <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-gray-200/80 px-4 py-3 shadow-2xs">
+        <div className="max-w-md mx-auto space-y-3">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => navigate(-1)}
+              className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors text-gray-700"
+              aria-label="Back"
+            >
+              <ArrowLeft size={20} />
+            </button>
+
+            <form onSubmit={handleSearchSubmit} className="flex-1 relative">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search Auto number, driver, area..."
+                className="w-full bg-gray-100/90 border border-gray-200/80 rounded-full pl-10 pr-9 py-2.5 text-xs font-semibold text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                autoFocus
+              />
+              <Search
+                size={16}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
+              />
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={clearSearch}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 p-0.5"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </form>
+          </div>
+
+          {/* Quick Filter Tags */}
+          <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none -mx-4 px-4">
+            {FILTER_TAGS.map((tag) => (
+              <button
+                key={tag}
+                onClick={() => setSelectedTag(tag)}
+                className={`text-[11px] font-bold px-3 py-1 rounded-full whitespace-nowrap transition-colors ${
+                  selectedTag === tag
+                    ? "bg-gray-900 text-white shadow-xs"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
         </div>
-        <form onSubmit={handleSearch} className="relative">
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search driver, school or auto number..."
-            className="w-full bg-gray-100 border-none rounded-full px-5 py-3 pr-12 outline-none focus:ring-2 focus:ring-emerald-500/50 text-gray-800 shadow-inner font-medium"
-            autoFocus
-          />
-          <button
-            type="submit"
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center text-white text-xs shadow-md"
-          >
-            🔍
-          </button>
-        </form>
       </div>
 
-      {/* Results List */}
-      <div className="px-6 py-4 space-y-4">
-        {isGoAnywhere && (
-          <div className="flex items-center gap-2 bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-700/30 rounded-full px-4 py-2.5">
-            <MapPin size={16} className="text-yellow-600 dark:text-yellow-400" />
-            <span className="text-sm font-semibold text-yellow-700 dark:text-yellow-300 truncate">
-              Going to: {goAnywhere}
-            </span>
-            <button
-              onClick={() => navigate("/")}
-              className="ml-auto text-xs font-bold text-yellow-600 dark:text-yellow-400 hover:text-yellow-700 shrink-0"
-            >
-              Clear
-            </button>
+      {/* Main Content Area */}
+      <div className="max-w-md mx-auto px-4 pt-4">
+        {/* Search Query Pill / Results Count */}
+        <div className="flex items-center justify-between mb-3 text-xs">
+          <div className="text-gray-500 font-medium">
+            {searchTerm ? (
+              <span>
+                Results for <strong className="text-gray-900">"{searchTerm}"</strong>
+              </span>
+            ) : (
+              <span>
+                Showing <strong className="text-gray-900">{filteredAutos.length}</strong> available autos
+              </span>
+            )}
           </div>
-        )}
-        {searchTerm && !isGoAnywhere && (
-          <p className="text-sm text-gray-500 font-medium">
-            Showing results for "{searchTerm}"
-          </p>
-        )}
+          <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-full">
+            {filteredAutos.length} Found
+          </span>
+        </div>
 
-        {filteredRides.length > 0 ? (
-          filteredRides.map((ride, idx) => (
-            <div
-              key={idx}
-              className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm relative overflow-hidden group"
-            >
-              <div className="absolute top-0 right-0 p-3">
-                <div className="bg-emerald-50 text-emerald-600 rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-wider border border-emerald-100 flex items-center gap-1">
-                  <ShieldCheck size={14} className="text-emerald-600" />
-                  Verified Guardian
-                </div>
-              </div>
-              <div className="flex items-start gap-4">
-                <div className="relative shrink-0">
-                  <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center text-3xl border-2 border-white shadow-sm">
-                    👨‍✈️
-                  </div>
-                  <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm">
-                    <div className="bg-yellow-400 text-black text-[10px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5">
-                      4.9 <Star size={10} fill="currentColor" strokeWidth={0} />
-                    </div>
-                  </div>
-                </div>
-                <div className="flex-1 pt-1">
-                  <h3 className="text-lg font-bold text-gray-900">
-                    {ride.driverName}
-                  </h3>
-                  <p className="text-xs text-gray-500 font-medium">
-                    {ride.vehicleType || "Auto Bhaiya"} • 5 Years Exp.
-                  </p>
-                  <div className="flex items-center gap-3 mt-3">
-                    <div className="bg-white border-2 border-gray-200 rounded px-2 py-1 shadow-sm flex items-center gap-1.5">
-                      <div className="w-2 h-2 rounded-full bg-blue-600"></div>
-                      <span className="font-mono text-xs font-bold text-emerald-600 tracking-wider">
-                        {ride.autoNumber}
-                      </span>
-                    </div>
-                    <span className="text-xs font-medium text-gray-400">|</span>
-                    <span className="text-xs font-semibold text-gray-700">
-                      500+ Trips
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-5 flex gap-3">
-                <button
-                  onClick={() => navigate(`/auto-bhaiya/${ride.autoNumber}`)}
-                  className={`flex-1 ${isGoAnywhere ? "bg-yellow-400 hover:bg-yellow-500 text-gray-900" : "bg-yellow-400 hover:bg-yellow-500 text-gray-900"} font-bold py-3.5 rounded-full text-sm transition-colors shadow-sm flex items-center justify-center gap-2`}
-                >
-                  {isGoAnywhere ? "Book Trip" : "Book for School"}
-                </button>
-                <button
-                  onClick={openChat}
-                  className="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 hover:text-emerald-600 transition-colors"
-                >
-                  <MessageCircle size={20} />
-                </button>
-              </div>
-            </div>
-          ))
+        {/* Auto Cards List */}
+        {filteredAutos.length > 0 ? (
+          <div className="space-y-3">
+            {filteredAutos.map((auto) => (
+              <AutoCard key={auto.id} auto={auto} />
+            ))}
+          </div>
         ) : (
-          <div className="text-center py-12 text-gray-500 flex flex-col items-center gap-3">
-            <span className="text-4xl">{isGoAnywhere ? "📍" : "🤔"}</span>
-            <p className="font-medium">
-              {isGoAnywhere
-                ? "We found verified drivers nearby. Try selecting one below!"
-                : `No rides found matching "${searchTerm}"`}
+          /* Empty State (Section 39) */
+          <div className="bg-white border border-gray-200 rounded-3xl p-8 text-center shadow-xs mt-4">
+            <div className="w-16 h-16 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
+              🛺
+            </div>
+            <h3 className="text-base font-extrabold text-gray-900 mb-1">
+              No Auto Bhaiya found
+            </h3>
+            <p className="text-xs text-gray-500 max-w-xs mx-auto mb-5 leading-relaxed">
+              We couldn't find any registered auto matching "{searchTerm}".
             </p>
+
+            <div className="bg-gray-50 rounded-2xl p-4 text-left border border-gray-100 max-w-xs mx-auto mb-5 text-xs text-gray-600 space-y-1.5">
+              <span className="font-bold text-gray-900 block mb-1">Try searching by:</span>
+              <p className="flex items-center gap-1.5">
+                <span className="text-emerald-600 font-bold">•</span>
+                <span>Auto number: <code className="bg-white px-1.5 py-0.5 rounded border border-gray-200 text-gray-800 font-mono text-[11px]">AB-101</code></span>
+              </p>
+              <p className="flex items-center gap-1.5">
+                <span className="text-emerald-600 font-bold">•</span>
+                <span>Driver name: <span className="font-semibold text-gray-800">Ashok, Rajesh</span></span>
+              </p>
+              <p className="flex items-center gap-1.5">
+                <span className="text-emerald-600 font-bold">•</span>
+                <span>Vehicle plate: <span className="font-semibold text-gray-800">JH05</span></span>
+              </p>
+              <p className="flex items-center gap-1.5">
+                <span className="text-emerald-600 font-bold">•</span>
+                <span>Area or Hub: <span className="font-semibold text-gray-800">Sakchi, Bistupur, Kadma</span></span>
+              </p>
+            </div>
+
+            <button
+              onClick={clearSearch}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-6 rounded-full text-xs transition-colors shadow-xs"
+            >
+              Clear Search & Show All
+            </button>
           </div>
         )}
       </div>
