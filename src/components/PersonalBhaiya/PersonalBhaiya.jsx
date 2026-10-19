@@ -14,6 +14,7 @@ import {
   Scan,
   MapPin,
   Navigation,
+  User
 } from "lucide-react";
 
 export default function PersonalBhaiya() {
@@ -107,7 +108,7 @@ export default function PersonalBhaiya() {
     vehicle: "Bajaj RE (CNG)",
     arrivalTime: "3 mins",
     languages: "Hindi, English",
-    avatar: "👨‍🦱",
+    avatar: "R",
     mapsUrl:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3502.9360824907153!2d77.218408074747!3d28.601693075681647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce2db961be393%3A0xf6c24c15321cf584!2sIndia%20Gate!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin",
     whatsappNumber: "+919999999999",
@@ -130,7 +131,7 @@ export default function PersonalBhaiya() {
         vehicle: selectedDriver.vehicleType,
         arrivalTime: "5 mins",
         languages: "Hindi",
-        avatar: "👮", // Different avatar for found driver
+        avatar: selectedDriver.driverName ? selectedDriver.driverName.charAt(0) : "A",
         mapsUrl: selectedDriver.mapsUrl,
         whatsappNumber: selectedDriver.whatsappNumber || "+919999999999",
       }

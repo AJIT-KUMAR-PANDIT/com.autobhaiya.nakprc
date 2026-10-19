@@ -3,6 +3,13 @@
  * Manages bookings in browser localStorage
  */
 
+import {
+  syncBookingToAppwrite,
+  updateAppwriteBookingStatus,
+  subscribeToBookingRealtime,
+  isAppwriteConfigured
+} from "../lib/appwrite.js";
+
 const STORAGE_KEY = "autobhaiya_bookings_v1";
 
 /**
@@ -107,6 +114,12 @@ export function createBooking({ auto, pickup, destination, fareEstimate }) {
   const current = getBookings();
   const updated = [newBooking, ...current.filter((b) => b.id !== newBooking.id)];
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  window.dispatchEvent(new CustomEvent("autobhaiya_booking_updated", { detail: newBooking }));
+
+  if (isAppwriteConfigured()) {
+    syncBookingToAppwrite(newBooking);
+  }
+
   return newBooking;
 }
 
@@ -128,6 +141,12 @@ export function updateBookingStatus(id, status) {
   };
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings));
+  window.dispatchEvent(new CustomEvent("autobhaiya_booking_updated", { detail: bookings[index] }));
+
+  if (isAppwriteConfigured()) {
+    updateAppwriteBookingStatus(bookings[index].id, status, null);
+  }
+
   return bookings[index];
 }
 
@@ -148,5 +167,58 @@ export function updatePaymentStatus(id, paymentStatus) {
   };
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings));
+  window.dispatchEvent(new CustomEvent("autobhaiya_booking_updated", { detail: bookings[index] }));
+
+  // Appwrite sync in background
+  if (isAppwriteConfigured()) {
+    updateAppwriteBookingStatus(bookings[index].id, null, paymentStatus);
+  }
+
   return bookings[index];
+}
+
+/**
+ * Save or merge a remote booking into local storage
+ * @param {Booking} booking
+ */
+export function saveBookingLocally(booking) {
+  if (!booking || !booking.id) return;
+  const current = getBookings();
+  const existingIndex = current.findIndex((b) => b.id === booking.id || b.bookingNumber === booking.id);
+  let updated;
+  if (existingIndex >= 0) {
+    current[existingIndex] = { ...current[existingIndex], ...booking };
+    updated = [...current];
+  } else {
+    updated = [booking, ...current];
+  }
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  window.dispatchEvent(new CustomEvent("autobhaiya_booking_updated", { detail: booking }));
+}
+
+/**
+ * Listen to real-time booking changes (Appwrite Realtime + local events)
+ * @param {string} [bookingId]
+ * @param {(booking: Booking) => void} callback
+ * @returns {() => void}
+ */
+export function subscribeToBookingUpdates(bookingId, callback) {
+  const handleLocal = (event) => {
+    const updated = event?.detail;
+    if (updated && (!bookingId || updated.id === bookingId || updated.bookingNumber === bookingId)) {
+      callback(updated);
+    }
+  };
+
+  window.addEventListener("autobhaiya_booking_updated", handleLocal);
+
+  const unsubAppwrite = subscribeToBookingRealtime(bookingId, (remoteDoc) => {
+    saveBookingLocally(remoteDoc);
+    callback(remoteDoc);
+  });
+
+  return () => {
+    window.removeEventListener("autobhaiya_booking_updated", handleLocal);
+    unsubAppwrite();
+  };
 }

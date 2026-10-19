@@ -19,6 +19,7 @@ export default function BottomNav() {
       className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-gray-200/80 shadow-[0_-4px_24px_rgba(0,0,0,0.06)] pb-[env(safe-area-inset-bottom)]"
       role="navigation"
       aria-label="Bottom Navigation"
+      data-testid="bottom-navigation"
     >
       <div className="max-w-md mx-auto h-[64px] px-2 flex items-center justify-around relative">
         {/* 1. Home */}
@@ -30,6 +31,7 @@ export default function BottomNav() {
               : "text-gray-500 hover:text-gray-900 font-medium"
           }`}
           aria-label="Home"
+          data-testid="bottom-nav-home"
         >
           <div className="relative">
             <Home size={22} strokeWidth={isHome ? 2.5 : 1.8} />
@@ -49,6 +51,7 @@ export default function BottomNav() {
               : "text-gray-500 hover:text-gray-900 font-medium"
           }`}
           aria-label="Verify Auto"
+          data-testid="bottom-nav-verify"
         >
           <div className="relative">
             <ShieldCheck size={22} strokeWidth={isVerify ? 2.5 : 1.8} />
@@ -65,6 +68,7 @@ export default function BottomNav() {
             to="/search"
             className="flex flex-col items-center group active:scale-95 transition-transform"
             aria-label="Search Auto"
+            data-testid="bottom-nav-search"
           >
             <div
               className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg border-3 border-white transition-all ${
@@ -94,6 +98,7 @@ export default function BottomNav() {
               : "text-gray-500 hover:text-gray-900 font-medium"
           }`}
           aria-label="Bookings"
+          data-testid="bottom-nav-bookings"
         >
           <div className="relative">
             <Clock3 size={22} strokeWidth={isBookings ? 2.5 : 1.8} />
@@ -113,6 +118,7 @@ export default function BottomNav() {
               : "text-gray-500 hover:text-gray-900 font-medium"
           }`}
           aria-label="Scan QR"
+          data-testid="bottom-nav-scan"
         >
           <div className="relative">
             <QrCode size={22} strokeWidth={isScan ? 2.5 : 1.8} />

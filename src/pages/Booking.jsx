@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams, Link } from "react-router-dom";
 import {
   ShieldCheck,
   MapPin,
@@ -10,7 +10,9 @@ import {
   Star,
   CheckCircle2,
   Navigation,
-  Sparkles
+  User,
+  Fuel,
+  Info
 } from "lucide-react";
 import { getAutoById } from "../data/autos.js";
 import { createBooking } from "../data/bookings.js";
@@ -26,26 +28,28 @@ const POPULAR_DESTINATIONS = [
 
 export default function BookingPage() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
   const auto = getAutoById(id);
 
-  const [pickup, setPickup] = useState(auto ? auto.area : "Sakchi Market");
-  const [destination, setDestination] = useState(
-    auto?.destinationHints?.[0] || "Bistupur Market"
-  );
+  const initialPickup = searchParams.get("pickup") || (auto ? auto.area : "Sakchi Golchakkar");
+  const initialDestination = searchParams.get("destination") || (auto?.destinationHints?.[0] || "Bistupur Market");
+
+  const [pickup, setPickup] = useState(initialPickup);
+  const [destination, setDestination] = useState(initialDestination);
   const [fare] = useState(auto ? auto.fareEstimate : 120);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
 
   if (!auto) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6 text-center pb-24">
         <h2 className="text-xl font-bold text-gray-900 mb-2">Auto Not Selected</h2>
-        <p className="text-xs text-gray-500 mb-4">Please select an auto to proceed with booking.</p>
+        <p className="text-xs text-gray-500 mb-4">Please select an auto from the verified directory to proceed.</p>
         <Link
           to="/search"
           className="bg-emerald-600 text-white font-bold px-6 py-2.5 rounded-full text-xs"
+          data-testid="find-auto-btn"
         >
           Find an Auto
         </Link>
@@ -63,17 +67,21 @@ export default function BookingPage() {
         fareEstimate: fare
       });
       navigate(`/tracking/${newBooking.id}`);
-    }, 400);
+    }, 350);
   };
 
+  const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(pickup)}&destination=${encodeURIComponent(destination)}`;
+
   return (
-    <div className="min-h-screen bg-gray-50 pb-32">
+    <div className="min-h-screen bg-gray-50 pb-32" data-testid="booking-page">
       {/* Top Header */}
       <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-gray-200/80 px-4 py-3 shadow-2xs">
         <div className="max-w-md mx-auto flex items-center justify-between">
           <button
             onClick={() => navigate(-1)}
             className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
+            aria-label="Back"
+            data-testid="booking-back-btn"
           >
             <ArrowLeft size={20} />
           </button>
@@ -85,11 +93,11 @@ export default function BookingPage() {
       </div>
 
       <div className="max-w-md mx-auto px-4 pt-4 space-y-4">
-        {/* Selected Auto Card (Section 16) */}
+        {/* Selected Auto Card */}
         <div className="bg-white border border-gray-200 rounded-3xl p-5 shadow-xs space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-gray-100">
             <span className="text-[10px] font-black uppercase tracking-wider text-gray-400">
-              Your Selected Auto Bhaiya
+              Selected Auto Bhaiya
             </span>
             <div className="flex items-center gap-1 bg-emerald-50 text-emerald-700 text-[10px] font-black px-2 py-0.5 rounded-full border border-emerald-200">
               <ShieldCheck size={12} />
@@ -98,8 +106,8 @@ export default function BookingPage() {
           </div>
 
           <div className="flex items-start gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-amber-400 flex items-center justify-center text-3xl shrink-0 shadow-xs">
-              👨‍✈️
+            <div className="w-14 h-14 rounded-2xl bg-amber-400 flex items-center justify-center text-gray-950 shrink-0 shadow-2xs">
+              <User size={28} strokeWidth={2.2} />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
@@ -110,13 +118,18 @@ export default function BookingPage() {
                   {auto.vehicleNumber}
                 </span>
               </div>
-              <h2 className="font-black text-lg text-gray-900 mt-1 truncate">
+              <h2 className="font-black text-base text-gray-900 mt-1 truncate">
                 {auto.driverName}
               </h2>
-              <div className="flex items-center gap-2 text-xs text-gray-500 mt-0.5">
-                <span>{auto.vehicleType}</span>
-                <span>•</span>
-                <span className="flex items-center gap-0.5 font-bold text-gray-800">
+              <div className="flex flex-wrap items-center gap-1.5 text-xs text-gray-500 mt-1">
+                <span className="bg-gray-100 px-1.5 py-0.5 rounded text-[10px] font-bold text-gray-700">
+                  {auto.category || "Passenger"}
+                </span>
+                <span className="bg-gray-100 px-1.5 py-0.5 rounded text-[10px] font-bold text-gray-700 flex items-center gap-0.5">
+                  <Fuel size={9} />
+                  <span>{auto.fuelType || "CNG"}</span>
+                </span>
+                <span className="flex items-center gap-0.5 font-bold text-gray-800 text-[11px]">
                   <Star size={11} className="text-amber-500 fill-amber-400" />
                   {auto.rating.toFixed(1)}
                 </span>
@@ -124,23 +137,36 @@ export default function BookingPage() {
             </div>
           </div>
 
-          {/* Quick Hub info */}
+          {/* Hub Arrival Info */}
           <div className="p-3 bg-gray-50 rounded-2xl flex items-center justify-between text-xs">
             <div className="flex items-center gap-1.5 text-gray-600">
               <Clock size={14} className="text-emerald-600" />
-              <span>Driver arrives in <strong>~{auto.etaMinutes} mins</strong></span>
+              <span>Driver arrives in <strong>~{auto.etaMinutes} mins</strong> (estimate)</span>
             </div>
             <span className="text-emerald-700 font-bold bg-emerald-100/60 px-2 py-0.5 rounded-md text-[11px]">
-              Fast Pickup
+              Direct Booking
             </span>
           </div>
         </div>
 
         {/* Route Inputs */}
         <div className="bg-white border border-gray-200 rounded-3xl p-5 shadow-xs space-y-4">
-          <h2 className="text-xs font-black uppercase tracking-wider text-gray-400">
-            Trip Locations
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-xs font-black uppercase tracking-wider text-gray-400">
+              Trip Locations
+            </h2>
+            <a
+              href={googleMapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[11px] font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1"
+              title="Open route in Google Maps directions"
+              data-testid="preview-maps-btn"
+            >
+              <Navigation size={12} />
+              <span>Google Maps Route</span>
+            </a>
+          </div>
 
           <div className="space-y-3">
             {/* Pickup */}
@@ -149,15 +175,14 @@ export default function BookingPage() {
                 <span className="w-2 h-2 rounded-full bg-emerald-500" />
                 <span>Pickup Location</span>
               </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={pickup}
-                  onChange={(e) => setPickup(e.target.value)}
-                  placeholder="Enter pickup point"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-gray-900 focus:bg-white focus:border-emerald-500 outline-none"
-                />
-              </div>
+              <input
+                type="text"
+                value={pickup}
+                onChange={(e) => setPickup(e.target.value)}
+                placeholder="Enter pickup point"
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-gray-900 focus:bg-white focus:border-emerald-500 outline-none"
+                data-testid="booking-pickup-input"
+              />
             </div>
 
             {/* Destination */}
@@ -166,15 +191,14 @@ export default function BookingPage() {
                 <span className="w-2 h-2 rounded-full bg-amber-500" />
                 <span>Destination Drop</span>
               </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={destination}
-                  onChange={(e) => setDestination(e.target.value)}
-                  placeholder="Where do you want to go?"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-gray-900 focus:bg-white focus:border-amber-500 outline-none"
-                />
-              </div>
+              <input
+                type="text"
+                value={destination}
+                onChange={(e) => setDestination(e.target.value)}
+                placeholder="Where do you want to go?"
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-gray-900 focus:bg-white focus:border-amber-500 outline-none"
+                data-testid="booking-destination-input"
+              />
             </div>
           </div>
 
@@ -206,7 +230,7 @@ export default function BookingPage() {
         <div className="bg-white border border-gray-200 rounded-3xl p-5 shadow-xs space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-black uppercase tracking-wider text-gray-400">
-              Estimated Fare
+              Estimated Total Fare
             </span>
             <span className="text-2xl font-black text-gray-950">
               ₹{fare}
@@ -215,12 +239,12 @@ export default function BookingPage() {
 
           <div className="space-y-1.5 pt-2 border-t border-gray-100 text-xs text-gray-600">
             <div className="flex justify-between">
-              <span>Base Meter / Zone Fare</span>
+              <span>Estimated Ride Fare</span>
               <span className="font-semibold text-gray-800">₹{fare}</span>
             </div>
             <div className="flex justify-between">
               <span>Booking Fee</span>
-              <span className="font-semibold text-emerald-700">₹0 (Free MVP)</span>
+              <span className="font-semibold text-emerald-700">₹0 (Zero Fee)</span>
             </div>
             <div className="flex justify-between text-gray-400 text-[11px]">
               <span>Payment Mode</span>
@@ -235,18 +259,19 @@ export default function BookingPage() {
             onClick={handleConfirmBooking}
             disabled={isSubmitting || !pickup.trim() || !destination.trim()}
             className="w-full bg-amber-400 hover:bg-amber-500 active:scale-[0.98] disabled:opacity-50 text-gray-950 font-black py-4 px-6 rounded-2xl text-base shadow-lg shadow-amber-400/30 flex items-center justify-center gap-2 transition-all"
+            data-testid="confirm-booking-btn"
           >
             {isSubmitting ? (
-              <span>Creating Booking...</span>
+              <span>Confirming Booking...</span>
             ) : (
               <>
-                <span>Confirm Booking (₹{fare})</span>
+                <span>Confirm Ride Booking (₹{fare})</span>
                 <ArrowRight size={20} />
               </>
             )}
           </button>
           <p className="text-[11px] text-gray-400 text-center mt-2">
-            No cancellation charges. Pay directly to Bhaiya upon arrival or trip start.
+            No cancellation fee or pre-payment needed. Call Auto Bhaiya to confirm availability before paying.
           </p>
         </div>
       </div>

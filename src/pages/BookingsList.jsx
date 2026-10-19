@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Clock,
@@ -10,14 +10,26 @@ import {
   CreditCard,
   RotateCw
 } from "lucide-react";
-import { getBookings } from "../data/bookings.js";
+import { getBookings, subscribeToBookingUpdates } from "../data/bookings.js";
 
 export default function BookingsListPage() {
   const navigate = useNavigate();
-  const [bookings] = useState(() => getBookings());
+  const [bookings, setBookings] = useState(() => getBookings());
+
+  const refresh = () => {
+    setBookings(getBookings());
+  };
+
+  useEffect(() => {
+    // Listen to real-time updates (Appwrite Realtime + local updates)
+    const unsub = subscribeToBookingUpdates(null, () => {
+      refresh();
+    });
+    return unsub;
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-32">
+    <div className="min-h-screen bg-gray-50 pb-32" data-testid="bookings-list-page">
       {/* Top Bar */}
       <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-gray-200/80 px-4 py-4 shadow-2xs">
         <div className="max-w-md mx-auto flex items-center justify-between">
@@ -33,6 +45,7 @@ export default function BookingsListPage() {
           <Link
             to="/search"
             className="bg-amber-400 hover:bg-amber-500 text-gray-950 font-bold text-xs px-3.5 py-2 rounded-xl transition-colors shadow-xs"
+            data-testid="new-ride-btn"
           >
             New Ride
           </Link>
@@ -40,61 +53,62 @@ export default function BookingsListPage() {
       </div>
 
       <div className="max-w-md mx-auto px-4 pt-4">
-        {bookings.length > 0 ? (
+        {bookings && bookings.length > 0 ? (
           <div className="space-y-3">
             {bookings.map((booking) => {
-              const isCompleted = booking.status === "completed";
               const isPaid = booking.paymentStatus === "completed";
 
               return (
                 <div
                   key={booking.id}
                   onClick={() => navigate(`/tracking/${booking.id}`)}
-                  className="bg-white border border-gray-200 rounded-2xl p-4 shadow-xs hover:shadow-md transition-all active:scale-[0.99] cursor-pointer"
+                  className="bg-white border border-gray-200/80 rounded-2xl p-4 shadow-xs hover:shadow-md transition-all cursor-pointer active:scale-[0.99] group"
+                  data-testid="booking-list-card"
                 >
-                  {/* Top Bar: Booking ID & Status */}
-                  <div className="flex items-center justify-between pb-3 border-b border-gray-100 text-xs">
+                  {/* Card Header */}
+                  <div className="flex items-center justify-between pb-2.5 border-b border-gray-100 text-xs">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono font-extrabold text-gray-900 bg-gray-100 px-2 py-0.5 rounded-md">
+                      <span className="font-mono font-bold text-gray-900 text-xs">
                         #{booking.bookingNumber}
                       </span>
-                      <span className="font-mono font-black text-amber-900 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md text-[11px]">
-                        {booking.autoNumber}
+                      <span className="font-mono text-gray-400 text-[10px]">
+                        • {booking.autoNumber}
                       </span>
                     </div>
 
-                    <span
-                      className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
-                        isCompleted
-                          ? "bg-gray-100 text-gray-600"
-                          : "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                      }`}
-                    >
-                      {booking.status}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full capitalize ${
+                          booking.status === "completed"
+                            ? "bg-gray-100 text-gray-700"
+                            : booking.status === "started"
+                            ? "bg-blue-50 text-blue-700"
+                            : "bg-emerald-50 text-emerald-700"
+                        }`}
+                      >
+                        {booking.status}
+                      </span>
+                    </div>
                   </div>
 
-                  {/* Driver & Fare */}
-                  <div className="pt-3 flex items-start justify-between gap-3">
-                    <div>
-                      <h2 className="font-extrabold text-sm text-gray-900">
-                        {booking.driverName}
-                      </h2>
-                      <p className="font-mono text-[11px] text-gray-500">
-                        {booking.vehicleNumber} • {booking.vehicleType}
-                      </p>
-
-                      {/* Locations */}
-                      <div className="mt-2 space-y-1 text-xs text-gray-600">
-                        <div className="flex items-center gap-1.5 truncate">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                          <span className="truncate">{booking.pickup}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 truncate">
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                          <span className="truncate">{booking.destination}</span>
-                        </div>
+                  {/* Trip details */}
+                  <div className="pt-3 flex items-start justify-between gap-3 text-xs">
+                    <div className="space-y-1.5 flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <MapPin size={13} className="text-emerald-500 shrink-0" />
+                        <span className="font-semibold text-gray-800 truncate">
+                          {booking.pickup}
+                        </span>
                       </div>
+                      <div className="flex items-center gap-2">
+                        <MapPin size={13} className="text-amber-500 shrink-0" />
+                        <span className="font-semibold text-gray-800 truncate">
+                          {booking.destination}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-gray-500 pt-1">
+                        Driver: <strong className="text-gray-800">{booking.driverName}</strong>
+                      </p>
                     </div>
 
                     <div className="text-right shrink-0">
@@ -106,7 +120,7 @@ export default function BookingsListPage() {
                           isPaid ? "text-emerald-600" : "text-amber-600"
                         }`}
                       >
-                        {isPaid ? "Paid ✓" : "Pay Pending"}
+                        {isPaid ? "Paid" : "Pay Pending"}
                       </span>
                     </div>
                   </div>
@@ -135,7 +149,7 @@ export default function BookingsListPage() {
                           <span>Pay UPI</span>
                         </button>
                       )}
-                      <span className="text-gray-400 flex items-center gap-0.5 font-bold text-xs text-gray-600">
+                      <span className="flex items-center gap-0.5 font-bold text-xs text-gray-600">
                         <span>Track</span>
                         <ChevronRight size={14} />
                       </span>
@@ -146,10 +160,10 @@ export default function BookingsListPage() {
             })}
           </div>
         ) : (
-          /* Empty State (Section 39) */
+          /* Empty State - NO EMOJIS */
           <div className="bg-white border border-gray-200 rounded-3xl p-8 text-center shadow-xs mt-6">
-            <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
-              🛺
+            <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-200">
+              <CarTaxiFront size={30} strokeWidth={2.2} />
             </div>
             <h2 className="text-base font-extrabold text-gray-900 mb-1">
               No rides yet

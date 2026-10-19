@@ -7,7 +7,10 @@ import {
   ArrowRight,
   RotateCcw,
   MapPin,
-  Info
+  Info,
+  Star,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { verifyAuto } from "../data/autos.js";
 
@@ -23,6 +26,7 @@ export default function VerifyPage() {
   const [inputHash, setInputHash] = useState(queryHash);
   const [activeTab, setActiveTab] = useState(queryAuto ? "result" : "manual");
   const [manualResult, setManualResult] = useState(null);
+  const [showHash, setShowHash] = useState(false);
 
   // Directly derive verification result (React 19 pattern: render computation over effect sync)
   const verificationResult = useMemo(() => {
@@ -216,8 +220,9 @@ export default function VerifyPage() {
                   <span className="text-gray-400 font-medium block text-[10px]">
                     Experience & Rating
                   </span>
-                  <span className="font-extrabold text-gray-900 text-sm mt-0.5 block">
-                    ★ {verificationResult.auto.rating.toFixed(1)}
+                  <span className="font-extrabold text-gray-900 text-sm mt-0.5 flex items-center gap-1">
+                    <Star size={13} className="text-amber-500 fill-amber-400" />
+                    <span>{verificationResult.auto.rating.toFixed(1)}</span>
                   </span>
                   <span className="text-[11px] text-gray-500">
                     {verificationResult.auto.trips.toLocaleString()} trips completed
@@ -238,24 +243,34 @@ export default function VerifyPage() {
                 </div>
               </div>
 
-              {/* Hash & Security info */}
-              <div className="p-3 bg-emerald-50/60 border border-emerald-200/60 rounded-xl">
+              {/* Hash & Security info with Masking Toggle */}
+              <div className="p-3 bg-emerald-50/60 border border-emerald-200/60 rounded-xl space-y-1">
                 <div className="flex items-center justify-between text-[11px]">
                   <span className="font-bold text-emerald-900">Security Hash:</span>
-                  <span className="font-mono font-bold text-emerald-800">
-                    {verificationResult.auto.verificationHash}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-mono font-bold text-emerald-800">
+                      {showHash ? verificationResult.auto.verificationHash : `${verificationResult.auto.verificationHash.slice(0, 5)}••••••••`}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowHash((v) => !v)}
+                      className="text-emerald-700 hover:text-emerald-900 p-0.5"
+                      title={showHash ? "Hide hash" : "View raw hash"}
+                    >
+                      {showHash ? <EyeOff size={13} /> : <Eye size={13} />}
+                    </button>
+                  </div>
                 </div>
-                <p className="text-[10px] text-emerald-800/80 mt-1 leading-relaxed">
-                  ✓ Pair match confirmed with local Auto Bhaiya registry.
+                <p className="text-[10px] text-emerald-800/80 leading-relaxed">
+                  Pair match confirmed with local Auto Bhaiya registry.
                 </p>
               </div>
 
-              {/* Trust Disclaimer */}
-              <div className="flex items-start gap-2 bg-gray-50 p-3 rounded-xl text-gray-500 text-[11px] leading-relaxed">
+              {/* Honest Security Boundary Disclaimer */}
+              <div className="flex items-start gap-2 bg-gray-50 border border-gray-200 p-3 rounded-xl text-gray-600 text-[11px] leading-relaxed">
                 <Info size={16} className="text-gray-400 shrink-0 mt-0.5" />
                 <p>
-                  This verification verifies that the Auto Bhaiya number and verification hash match a registered Auto Bhaiya record in this application.
+                  <strong>Security Boundary:</strong> Frontend verification confirms that this Auto Bhaiya number and verification hash match our bundled registry records. This confirms dataset membership, but cannot prevent unauthorized physical duplication of a QR code sticker. It is not server-secure or tamper-proof.
                 </p>
               </div>
 

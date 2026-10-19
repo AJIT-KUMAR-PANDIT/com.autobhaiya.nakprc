@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Send, MessageCircle, Phone, Sparkles } from "lucide-react";
+import { ArrowLeft, Send, MessageCircle, Phone, Sparkles, CarTaxiFront, Bell, CreditCard } from "lucide-react";
 
 const CHAT_STORAGE_KEY = "autobhaiya_chat_history";
 
@@ -29,7 +29,7 @@ const CONTACTS = [
   {
     id: "auto-bhaiya-general",
     name: "Auto Bhaiya Support",
-    avatar: "🛺",
+    Icon: CarTaxiFront,
     lastSeen: "online",
     isOnline: true,
     color: "from-emerald-500 to-teal-600",
@@ -37,7 +37,7 @@ const CONTACTS = [
   {
     id: "auto-bhaiya-alerts",
     name: "Trip Alerts",
-    avatar: "🔔",
+    Icon: Bell,
     lastSeen: "online",
     isOnline: true,
     color: "from-amber-500 to-orange-600",
@@ -45,7 +45,7 @@ const CONTACTS = [
   {
     id: "auto-bhaiya-payments",
     name: "Payment Help",
-    avatar: "💳",
+    Icon: CreditCard,
     lastSeen: "online",
     isOnline: true,
     color: "from-blue-500 to-indigo-600",
@@ -83,8 +83,8 @@ function ActiveChatView({ contact, messages, onBack, onSend }) {
         <button onClick={onBack} className="text-white shrink-0 hover:opacity-80">
           <ArrowLeft size={22} />
         </button>
-        <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${contact.color} flex items-center justify-center text-lg shrink-0`}>
-          {contact.avatar}
+        <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${contact.color} flex items-center justify-center text-white shrink-0`}>
+          {contact.Icon ? <contact.Icon size={20} /> : <CarTaxiFront size={20} />}
         </div>
         <div className="min-w-0 flex-1">
           <h3 className="text-white text-sm font-semibold truncate">{contact.name}</h3>
@@ -106,8 +106,8 @@ function ActiveChatView({ contact, messages, onBack, onSend }) {
 
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${contact.color} flex items-center justify-center mb-3 text-2xl shadow-md`}>
-              {contact.avatar}
+            <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${contact.color} flex items-center justify-center mb-3 text-white shadow-md`}>
+              {contact.Icon ? <contact.Icon size={30} /> : <CarTaxiFront size={30} />}
             </div>
             <p className="text-gray-700 text-sm font-medium">
               Say hi to {contact.name}!
@@ -261,8 +261,8 @@ export default function ChatPage() {
                 onClick={() => handleContactClick(contact)}
                 className="w-full flex items-center gap-3 p-3 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left"
               >
-                <div className={`w-14 h-14 rounded-full bg-gradient-to-br ${contact.color} flex items-center justify-center text-2xl shrink-0 shadow-sm`}>
-                  {contact.avatar}
+                <div className={`w-14 h-14 rounded-full bg-gradient-to-br ${contact.color} flex items-center justify-center text-white shrink-0 shadow-sm`}>
+                  {contact.Icon ? <contact.Icon size={26} /> : <CarTaxiFront size={26} />}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">

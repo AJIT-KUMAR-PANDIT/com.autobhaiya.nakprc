@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Scanner } from "@yudiel/react-qr-scanner";
 import { useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, ScanLine, Keyboard, Sparkles, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ScanLine, Keyboard, Sparkles, ShieldCheck, Camera, CheckCircle2, XCircle } from "lucide-react";
 
 export default function ScannerPage() {
   const navigate = useNavigate();
@@ -113,8 +113,9 @@ export default function ScannerPage() {
       {/* Quick Camera Fallback / Test Actions */}
       <div className="relative z-20 bg-gray-950/90 border-t border-gray-800 p-4 space-y-3">
         {scanError && (
-          <div className="bg-amber-950/80 border border-amber-600/60 text-amber-200 px-3.5 py-2 rounded-xl text-xs flex items-center justify-between">
-            <span>📷 Camera access: {scanError}</span>
+          <div className="bg-amber-950/80 border border-amber-600/60 text-amber-200 px-3.5 py-2 rounded-xl text-xs flex items-center gap-2">
+            <Camera size={14} className="text-amber-400 shrink-0" />
+            <span>Camera access: {scanError}</span>
           </div>
         )}
 
@@ -125,25 +126,32 @@ export default function ScannerPage() {
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => handleSimulateScan("AB-101", "AB101-X8K92P7Q")}
-              className="bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/50 text-emerald-200 text-xs font-bold py-2.5 px-3 rounded-xl transition-colors text-left"
+              className="bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/50 text-emerald-200 text-xs font-bold py-2.5 px-3 rounded-xl transition-colors text-left flex items-center gap-1.5"
+              data-testid="sim-ab101-btn"
             >
-              ✓ Scan AB-101 (Valid)
+              <CheckCircle2 size={13} className="text-emerald-400 shrink-0" />
+              <span>Scan AB-101 (Valid)</span>
             </button>
             <button
               onClick={() => handleSimulateScan("AB-204", "AB204-M4N73T9W")}
-              className="bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/50 text-emerald-200 text-xs font-bold py-2.5 px-3 rounded-xl transition-colors text-left"
+              className="bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/50 text-emerald-200 text-xs font-bold py-2.5 px-3 rounded-xl transition-colors text-left flex items-center gap-1.5"
+              data-testid="sim-ab204-btn"
             >
-              ✓ Scan AB-204 (Valid)
+              <CheckCircle2 size={13} className="text-emerald-400 shrink-0" />
+              <span>Scan AB-204 (Valid)</span>
             </button>
             <button
               onClick={() => handleSimulateScan("AB-101", "FAKE-HASH-123")}
-              className="bg-red-950/40 hover:bg-red-900/60 border border-red-500/40 text-red-300 text-xs font-bold py-2.5 px-3 rounded-xl transition-colors text-left"
+              className="bg-red-950/40 hover:bg-red-900/60 border border-red-500/40 text-red-300 text-xs font-bold py-2.5 px-3 rounded-xl transition-colors text-left flex items-center gap-1.5"
+              data-testid="sim-fake-btn"
             >
-              ✗ Scan Fake QR (Invalid)
+              <XCircle size={13} className="text-red-400 shrink-0" />
+              <span>Test Invalid QR</span>
             </button>
             <button
               onClick={() => navigate("/verify")}
               className="bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-bold py-2.5 px-3 rounded-xl transition-colors flex items-center justify-center gap-1.5"
+              data-testid="manual-entry-btn"
             >
               <Keyboard size={14} />
               <span>Manual Entry</span>

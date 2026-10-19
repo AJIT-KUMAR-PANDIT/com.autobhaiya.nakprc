@@ -6,23 +6,28 @@ import {
   QrCode,
   MapPin,
   ArrowRight,
-  Sparkles,
   Car,
   Clock,
   Star,
   CheckCircle2,
-  Navigation
+  Navigation,
+  Building2,
+  Compass,
+  Factory,
+  Train,
+  Fuel,
+  Filter
 } from "lucide-react";
-import { getAutos } from "../../data/autos.js";
+import { getAutos, CATEGORIES, FUEL_TYPES } from "../../data/autos.js";
 import AutoCard from "../Shared/AutoCard.jsx";
 
 const POPULAR_HUBS = [
-  { name: "Sakchi", icon: "📍" },
-  { name: "Bistupur", icon: "🏢" },
-  { name: "Kadma", icon: "🛺" },
-  { name: "Sonari", icon: "✈️" },
-  { name: "Telco", icon: "🏭" },
-  { name: "Tatanagar", icon: "🚆" }
+  { name: "Sakchi", icon: MapPin },
+  { name: "Bistupur", icon: Building2 },
+  { name: "Kadma", icon: Car },
+  { name: "Sonari", icon: Compass },
+  { name: "Telco", icon: Factory },
+  { name: "Tatanagar", icon: Train }
 ];
 
 export default function Home() {
@@ -45,12 +50,12 @@ export default function Home() {
   const handleDestinationSubmit = (e) => {
     e?.preventDefault();
     if (destinationInput.trim()) {
-      navigate(`/search?go-anywhere=${encodeURIComponent(destinationInput.trim())}`);
+      navigate(`/search?q=${encodeURIComponent(destinationInput.trim())}`);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-32">
+    <div className="min-h-screen bg-gray-50 pb-32" data-testid="home-page">
       {/* Hero Mobility Search Header */}
       <section className="bg-gradient-to-b from-amber-400 via-amber-300 to-amber-200/50 pt-5 pb-7 px-4 rounded-b-[32px] shadow-xs">
         <div className="max-w-md mx-auto space-y-4">
@@ -67,8 +72,8 @@ export default function Home() {
 
           <div>
             <h1 className="text-2xl font-black text-gray-950 tracking-tight leading-tight">
-              Book Your Trusted <br />
-              <span className="text-emerald-900">Auto Bhaiya</span> Instantly
+              Auto Bhaiya <br />
+              <span className="text-emerald-950">by NAKPRC</span>
             </h1>
             <p className="text-xs font-semibold text-gray-800/80 mt-1">
               Verified identity numbers, authentic QR codes & fair direct fares.
@@ -87,12 +92,14 @@ export default function Home() {
               type="text"
               value={quickSearch}
               onChange={(e) => setQuickSearch(e.target.value)}
-              placeholder="Search Auto number (e.g. AB-101), driver, area..."
+              placeholder="Search Auto # (e.g. AB-101), driver, area, fuel..."
               className="w-full bg-transparent pl-2.5 pr-2 py-2 text-xs font-bold text-gray-900 placeholder:text-gray-400 outline-none"
+              data-testid="home-search-input"
             />
             <button
               type="submit"
               className="bg-gray-950 hover:bg-black text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-transform active:scale-95 shrink-0"
+              data-testid="home-search-btn"
             >
               Search
             </button>
@@ -103,6 +110,7 @@ export default function Home() {
             <Link
               to="/scan"
               className="bg-white/80 backdrop-blur-sm border border-amber-200/80 p-2.5 rounded-2xl flex flex-col items-center hover:bg-white active:scale-95 transition-all shadow-2xs"
+              data-testid="quick-scan-btn"
             >
               <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center mb-1">
                 <QrCode size={18} />
@@ -115,6 +123,7 @@ export default function Home() {
             <Link
               to="/verify"
               className="bg-white/80 backdrop-blur-sm border border-amber-200/80 p-2.5 rounded-2xl flex flex-col items-center hover:bg-white active:scale-95 transition-all shadow-2xs"
+              data-testid="quick-verify-btn"
             >
               <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-900 flex items-center justify-center mb-1">
                 <ShieldCheck size={18} />
@@ -127,6 +136,7 @@ export default function Home() {
             <Link
               to="/search"
               className="bg-white/80 backdrop-blur-sm border border-amber-200/80 p-2.5 rounded-2xl flex flex-col items-center hover:bg-white active:scale-95 transition-all shadow-2xs"
+              data-testid="quick-directory-btn"
             >
               <div className="w-9 h-9 rounded-xl bg-blue-100 text-blue-900 flex items-center justify-center mb-1">
                 <Car size={18} />
@@ -139,12 +149,13 @@ export default function Home() {
             <Link
               to="/bookings"
               className="bg-white/80 backdrop-blur-sm border border-amber-200/80 p-2.5 rounded-2xl flex flex-col items-center hover:bg-white active:scale-95 transition-all shadow-2xs"
+              data-testid="quick-rides-btn"
             >
               <div className="w-9 h-9 rounded-xl bg-purple-100 text-purple-900 flex items-center justify-center mb-1">
                 <Clock size={18} />
               </div>
               <span className="text-[10px] font-bold text-gray-900 leading-tight">
-                Rides
+                My Rides
               </span>
             </Link>
           </div>
@@ -153,7 +164,7 @@ export default function Home() {
 
       {/* Main Home Sections */}
       <div className="max-w-md mx-auto px-4 pt-5 space-y-6">
-        {/* Where to Go Anywhere Section */}
+        {/* Where to Go Section */}
         <div className="bg-white border border-gray-200 rounded-3xl p-5 shadow-xs space-y-3">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-amber-400 flex items-center justify-center text-xs">
@@ -192,17 +203,58 @@ export default function Home() {
             </button>
           </form>
 
-          {/* Quick Hub Chips */}
+          {/* Quick Hub Chips - Zero Emojis */}
           <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none pt-1">
-            {POPULAR_HUBS.map((hub) => (
+            {POPULAR_HUBS.map((hub) => {
+              const HubIcon = hub.icon;
+              return (
+                <button
+                  key={hub.name}
+                  type="button"
+                  onClick={() => navigate(`/search?q=${encodeURIComponent(hub.name)}`)}
+                  className="text-[11px] font-bold bg-gray-50 hover:bg-gray-100 border border-gray-200/80 px-2.5 py-1.5 rounded-lg text-gray-700 whitespace-nowrap flex items-center gap-1.5"
+                >
+                  <HubIcon size={12} className="text-emerald-700" />
+                  <span>{hub.name}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Category & Fuel Quick Browse */}
+        <div className="bg-white border border-gray-200 rounded-3xl p-5 shadow-xs space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-black uppercase tracking-wider text-gray-900 flex items-center gap-1.5">
+              <Filter size={13} className="text-emerald-600" />
+              <span>Browse by Auto Type & Fuel</span>
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            {CATEGORIES.map((cat) => (
               <button
-                key={hub.name}
-                type="button"
-                onClick={() => navigate(`/search?q=${encodeURIComponent(hub.name)}`)}
-                className="text-[11px] font-bold bg-gray-50 hover:bg-gray-100 border border-gray-200/80 px-2.5 py-1 rounded-lg text-gray-700 whitespace-nowrap flex items-center gap-1"
+                key={cat}
+                onClick={() => navigate(`/search?category=${cat.toLowerCase()}`)}
+                className="p-3 bg-gray-50 hover:bg-emerald-50/60 border border-gray-200 rounded-2xl text-left transition-colors"
               >
-                <span>{hub.icon}</span>
-                <span>{hub.name}</span>
+                <span className="font-extrabold text-gray-900 block">{cat} Autos</span>
+                <span className="text-[10px] text-gray-500 block mt-0.5">
+                  {cat === "Passenger" ? "Daily passenger transit" : "Commercial luggage & logistics"}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {FUEL_TYPES.map((fuel) => (
+              <button
+                key={fuel}
+                onClick={() => navigate(`/search?fuel=${fuel.toLowerCase()}`)}
+                className="text-[11px] font-bold px-2.5 py-1 bg-gray-100 hover:bg-amber-100 text-gray-800 rounded-lg border border-gray-200 flex items-center gap-1 transition-colors"
+              >
+                <Fuel size={10} className="text-amber-600" />
+                <span>{fuel}</span>
               </button>
             ))}
           </div>
@@ -236,7 +288,7 @@ export default function Home() {
         </div>
 
         {/* Safety & Identity Banner */}
-        <div className="bg-emerald-800 text-white rounded-3xl p-5 shadow-sm space-y-2 relative overflow-hidden">
+        <div className="bg-emerald-900 text-white rounded-3xl p-5 shadow-sm space-y-2 relative overflow-hidden">
           <div className="flex items-center gap-2">
             <ShieldCheck size={18} className="text-emerald-300" />
             <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-200">

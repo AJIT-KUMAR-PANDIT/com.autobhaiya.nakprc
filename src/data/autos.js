@@ -17,6 +17,8 @@
  * @property {string} vehicleType
  * @property {number} seats
  * @property {string} color
+ * @property {"Passenger" | "Cargo"} category
+ * @property {"Electric" | "CNG" | "Petrol" | "Diesel" | "Hydrogen" | "LPG" | "Other"} fuelType
  * @property {string} area
  * @property {number} etaMinutes
  * @property {number} fareEstimate
@@ -24,6 +26,18 @@
  * @property {boolean} available
  * @property {string[]} destinationHints
  */
+
+export const CATEGORIES = ["Passenger", "Cargo"];
+
+export const FUEL_TYPES = [
+  "Electric",
+  "CNG",
+  "Petrol",
+  "Diesel",
+  "Hydrogen",
+  "LPG",
+  "Other"
+];
 
 export const AUTOS = [
   {
@@ -37,6 +51,8 @@ export const AUTOS = [
     trips: 1240,
     vehicleNumber: "JH05-AB-1234",
     vehicleType: "CNG Auto",
+    category: "Passenger",
+    fuelType: "CNG",
     seats: 3,
     color: "Yellow & Green",
     area: "Sakchi",
@@ -57,6 +73,8 @@ export const AUTOS = [
     trips: 980,
     vehicleNumber: "JH05-CD-5678",
     vehicleType: "Bajaj RE CNG",
+    category: "Passenger",
+    fuelType: "CNG",
     seats: 3,
     color: "Yellow & Black",
     area: "Bistupur",
@@ -77,6 +95,8 @@ export const AUTOS = [
     trips: 1520,
     vehicleNumber: "JH05-EF-9012",
     vehicleType: "Piaggio Ape",
+    category: "Passenger",
+    fuelType: "Petrol",
     seats: 3,
     color: "Yellow & Green",
     area: "Kadma",
@@ -90,19 +110,21 @@ export const AUTOS = [
     id: "auto-427",
     autoNumber: "AB-427",
     verificationHash: "AB427-Q6W18V3S",
-    name: "Atul Gem Cargo & Passenger",
+    name: "Atul Gem Cargo Carrier",
     driverName: "Mohammad Imran",
     phone: "+91 93348 76523",
     rating: 4.7,
     trips: 760,
     vehicleNumber: "JH05-GH-3456",
-    vehicleType: "Atul Gem CNG",
-    seats: 4,
+    vehicleType: "Atul Gem Cargo",
+    category: "Cargo",
+    fuelType: "CNG",
+    seats: 2,
     color: "Yellow & Green",
     area: "Sonari",
     etaMinutes: 7,
     fareEstimate: 140,
-    pickupNote: "Near Sonari Airport Crossing",
+    pickupNote: "Near Sonari Airport Crossing (Heavy Goods/Luggage)",
     available: true,
     destinationHints: ["Sonari", "Kagalnagar", "Kadma", "Sakchi", "Riverside", "Carmel School"]
   },
@@ -117,6 +139,8 @@ export const AUTOS = [
     trips: 1890,
     vehicleNumber: "JH05-JK-7890",
     vehicleType: "Electric Auto",
+    category: "Passenger",
+    fuelType: "Electric",
     seats: 4,
     color: "Electric Green & White",
     area: "Telco",
@@ -136,7 +160,9 @@ export const AUTOS = [
     rating: 4.8,
     trips: 1110,
     vehicleNumber: "JH05-LM-2345",
-    vehicleType: "Bajaj Maxima",
+    vehicleType: "Bajaj Maxima Diesel",
+    category: "Passenger",
+    fuelType: "Diesel",
     seats: 3,
     color: "Yellow & Black",
     area: "Golmuri",
@@ -150,15 +176,17 @@ export const AUTOS = [
     id: "auto-723",
     autoNumber: "AB-723",
     verificationHash: "AB723-Z5V92N4K",
-    name: "TVS King Duramax CNG",
+    name: "TVS King Eco Hydrogen Prototype",
     driverName: "Manoj Tiwari",
     phone: "+91 95723 11984",
     rating: 4.8,
     trips: 840,
     vehicleNumber: "JH05-NP-6789",
-    vehicleType: "TVS King CNG",
+    vehicleType: "TVS King Hydrogen",
+    category: "Passenger",
+    fuelType: "Hydrogen",
     seats: 3,
-    color: "Yellow & Green",
+    color: "Cyan Blue & White",
     area: "Mango",
     etaMinutes: 6,
     fareEstimate: 130,
@@ -177,6 +205,8 @@ export const AUTOS = [
     trips: 1390,
     vehicleNumber: "JH05-QR-4321",
     vehicleType: "Electric Auto",
+    category: "Passenger",
+    fuelType: "Electric",
     seats: 3,
     color: "Teal Green & White",
     area: "Jugsalai",
@@ -190,13 +220,15 @@ export const AUTOS = [
     id: "auto-945",
     autoNumber: "AB-945",
     verificationHash: "AB945-E2B48G9P",
-    name: "Bajaj Compact 4S",
+    name: "Bajaj Compact 4S Clean LPG",
     driverName: "Deepak Sharma",
     phone: "+91 93867 43905",
     rating: 4.7,
     trips: 650,
     vehicleNumber: "JH05-ST-8765",
-    vehicleType: "CNG Auto",
+    vehicleType: "Bajaj LPG",
+    category: "Passenger",
+    fuelType: "LPG",
     seats: 3,
     color: "Yellow & Green",
     area: "Baridih",
@@ -210,19 +242,21 @@ export const AUTOS = [
     id: "auto-156",
     autoNumber: "AB-156",
     verificationHash: "AB156-D8S63W5C",
-    name: "Mahindra Alfa DX",
+    name: "Mahindra Alfa Heavy Cargo",
     driverName: "Sanjay Hansda",
     phone: "+91 98014 90817",
     rating: 4.8,
     trips: 920,
     vehicleNumber: "JH05-UV-2109",
-    vehicleType: "Bajaj RE",
-    seats: 3,
+    vehicleType: "Mahindra Alfa Cargo",
+    category: "Cargo",
+    fuelType: "Diesel",
+    seats: 2,
     color: "Yellow & Black",
     area: "Adityapur",
     etaMinutes: 9,
     fareEstimate: 160,
-    pickupNote: "Near Adityapur Industrial Area Phase 1",
+    pickupNote: "Near Adityapur Industrial Area Phase 1 (Cargo Logistics)",
     available: true,
     destinationHints: ["Adityapur", "Bistupur", "NIT Jamshedpur", "Gamharia", "Toll Bridge"]
   }
@@ -401,22 +435,38 @@ export function getVerificationUrl(auto, absolute = false) {
 }
 
 /**
- * Search autos by query string
- * Matches driver, vehicle number, auto number, area, destination, vehicle type
- * @param {string} query
+ * Search autos by query string and optional filters
+ * Matches driver, vehicle number, auto number, area, destination, vehicle type, category, fuel type
+ * @param {string} [query=""]
+ * @param {{ category?: string, fuelType?: string }} [filters={}]
  * @returns {Auto[]}
  */
-export function searchAutos(query) {
-  if (!query || !query.trim()) return AUTOS;
-  const q = query.toLowerCase().trim();
+export function searchAutos(query = "", filters = {}) {
+  const q = (query || "").toLowerCase().trim();
+  const categoryFilter = filters?.category && filters.category !== "all" ? filters.category.toLowerCase().trim() : null;
+  const fuelFilter = filters?.fuelType && filters.fuelType !== "all" ? filters.fuelType.toLowerCase().trim() : null;
 
   return AUTOS.filter((a) => {
+    // Category filter
+    if (categoryFilter && (a.category || "").toLowerCase() !== categoryFilter) {
+      return false;
+    }
+
+    // Fuel/Energy filter
+    if (fuelFilter && (a.fuelType || "").toLowerCase() !== fuelFilter) {
+      return false;
+    }
+
+    if (!q) return true;
+
     return (
       a.autoNumber.toLowerCase().includes(q) ||
       a.autoNumber.replace("-", "").toLowerCase().includes(q) ||
       a.driverName.toLowerCase().includes(q) ||
       a.vehicleNumber.toLowerCase().includes(q) ||
       a.vehicleType.toLowerCase().includes(q) ||
+      (a.category && a.category.toLowerCase().includes(q)) ||
+      (a.fuelType && a.fuelType.toLowerCase().includes(q)) ||
       a.area.toLowerCase().includes(q) ||
       a.name.toLowerCase().includes(q) ||
       a.destinationHints.some((d) => d.toLowerCase().includes(q))

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ShieldCheck, Star, MessageCircle, ArrowLeft } from "lucide-react";
+import { ShieldCheck, Star, MessageCircle, ArrowLeft, User } from "lucide-react";
 
 export default function HistoryPage() {
   const navigate = useNavigate();
@@ -43,8 +43,8 @@ export default function HistoryPage() {
               </div>
               <div className="flex items-start gap-4">
                 <div className="relative shrink-0">
-                  <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center text-3xl border-2 border-white shadow-sm">
-                    👨‍✈️
+                  <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 border-2 border-white shadow-sm">
+                    <User size={30} strokeWidth={2.2} />
                   </div>
                   <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm">
                     <div className="bg-yellow-400 text-black text-[10px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5">
