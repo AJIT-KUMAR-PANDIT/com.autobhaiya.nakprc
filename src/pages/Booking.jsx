@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { getAutoById } from "../data/autos.js";
 import { createBooking } from "../data/bookings.js";
+import { useAuth } from "../context/AuthContext.jsx";
 
 const POPULAR_DESTINATIONS = [
   "Bistupur Market",
@@ -30,6 +31,7 @@ export default function BookingPage() {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { user, isSignedIn, openAuthModal } = useAuth();
 
   const auto = getAutoById(id);
 
@@ -64,7 +66,10 @@ export default function BookingPage() {
         auto,
         pickup,
         destination,
-        fareEstimate: fare
+        fareEstimate: fare,
+        passengerName: user?.name || "Verified Rider",
+        passengerPhone: user?.phone || "",
+        passengerId: user?.id || ""
       });
       navigate(`/tracking/${newBooking.id}`);
     }, 350);
@@ -147,6 +152,53 @@ export default function BookingPage() {
               Direct Booking
             </span>
           </div>
+        </div>
+
+        {/* Passenger Identity / Auth Context */}
+        <div className="bg-white border border-gray-200 rounded-3xl p-4 shadow-xs">
+          {isSignedIn && user ? (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-black text-xs shrink-0">
+                  {user.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-extrabold text-xs text-gray-900">{user.name}</span>
+                    <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                      Rider
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-gray-500">{user.phone || "No phone added"}</p>
+                </div>
+              </div>
+              <Link
+                to="/profile"
+                className="text-[11px] font-bold text-gray-500 hover:text-gray-900 underline"
+              >
+                Edit
+              </Link>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-900 flex items-center justify-center shrink-0">
+                  <User size={18} />
+                </div>
+                <div>
+                  <p className="font-bold text-xs text-gray-900">Booking as Guest</p>
+                  <p className="text-[10px] text-gray-500">Sign in to save trip & enable SOS emergency contact</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => openAuthModal("phone")}
+                className="bg-gray-950 hover:bg-black text-white text-[11px] font-bold px-3 py-1.5 rounded-xl transition-all active:scale-95 shrink-0"
+              >
+                Sign In
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Route Inputs */}

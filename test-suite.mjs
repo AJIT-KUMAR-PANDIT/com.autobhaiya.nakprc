@@ -7,6 +7,18 @@ import {
   getAutoByAutoNumber,
   getVerificationUrl
 } from "./src/data/autos.js";
+import {
+  requestOtp,
+  verifyOtp,
+  loginAsDemo,
+  getStoredUser,
+  setStoredUser,
+  clearStoredUser,
+  updateUserProfile,
+  sanitizePhone,
+  isValidPhone,
+  DEMO_PROFILES
+} from "./src/data/auth.js";
 import { readFileSync } from "fs";
 import { resolve } from "path";
 
@@ -185,6 +197,56 @@ assert(quotaAfterReset.isLocked === false, "Driver is unlocked after Super Admin
 const availToggle = setDriverAvailability(testAutoId, false, "Auto Admin");
 assert(availToggle.success === true, "setDriverAvailability succeeds");
 assert(availToggle.auto.available === false, "Driver is set to offline");
+
+// 7. AUTHENTICATION & USER MANAGEMENT
+console.log("\n7. Testing Authentication & User Management...");
+
+// Test phone validation and sanitization
+assert(isValidPhone("9876543210") === true, "isValidPhone validates 10-digit number");
+assert(isValidPhone("123") === false, "isValidPhone rejects short numbers");
+assert(sanitizePhone("9876543210") === "+91 98765 43210", "sanitizePhone formats Indian number correctly");
+
+// Test OTP request
+const otpReqSuccess = requestOtp("9876543210");
+assert(otpReqSuccess.success === true, "requestOtp succeeds for valid phone");
+assert(otpReqSuccess.otp === "1234", "requestOtp returns demo verification OTP");
+
+const otpReqFail = requestOtp("123");
+assert(otpReqFail.success === false, "requestOtp fails for invalid phone");
+
+// Test OTP verification with bad code
+const verifyFail = verifyOtp("9876543210", "00");
+assert(verifyFail.success === false, "verifyOtp fails for invalid OTP code");
+
+// Test Passenger Login via OTP
+const passengerAuth = verifyOtp("9876543210", "1234");
+assert(passengerAuth.success === true, "verifyOtp succeeds for passenger number");
+assert(passengerAuth.user.name === "Pooja Sharma", "Matches Pooja Sharma passenger profile");
+assert(getStoredUser()?.name === "Pooja Sharma", "getStoredUser reflects active passenger session");
+
+// Test Updating Profile & Emergency Contact
+const profileUpdate = updateUserProfile({
+  email: "pooja.updated@example.com",
+  emergencyContact: { name: "Anand Sharma", phone: "+91 98765 22222" }
+});
+assert(profileUpdate.email === "pooja.updated@example.com", "updateUserProfile updates email");
+assert(profileUpdate.emergencyContact.name === "Anand Sharma", "updateUserProfile updates emergency contact name");
+assert(getStoredUser().emergencyContact.phone === "+91 98765 22222", "Stored user holds new emergency phone");
+
+// Test Driver Login via Demo
+const driverDemo = loginAsDemo("driver");
+assert(driverDemo.role === "driver", "loginAsDemo switches role to driver");
+assert(driverDemo.autoNumber === "AB-101", "Driver has valid autoNumber AB-101");
+assert(getStoredUser()?.role === "driver", "getStoredUser reflects driver role");
+
+// Test Super Admin Login via Demo
+const adminDemo = loginAsDemo("admin");
+assert(adminDemo.role === "super_admin", "loginAsDemo switches role to super_admin");
+assert(getStoredUser()?.role === "super_admin", "getStoredUser reflects super_admin role");
+
+// Test Sign Out
+clearStoredUser();
+assert(getStoredUser() === null, "clearStoredUser successfully signs out user");
 
 // SUMMARY
 console.log(`\n========================================`);

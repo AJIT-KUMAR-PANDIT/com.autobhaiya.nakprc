@@ -53,10 +53,13 @@ import {
 } from "../data/admin.js";
 import { getBookings, updateBookingStatus } from "../data/bookings.js";
 import { isAppwriteConfigured } from "../lib/appwrite.js";
+import { useAuth } from "../context/AuthContext.jsx";
 
 export default function AdminDashboard() {
+  const { user, openAuthModal } = useAuth();
+
   // Roles: "super_admin" | "auto_admin"
-  const [role, setRole] = useState("super_admin");
+  const [role, setRole] = useState(() => (user?.role === "driver" ? "auto_admin" : "super_admin"));
   const [superTab, setSuperTab] = useState("fleet"); // "fleet" | "bookings" | "audit" | "system"
 
   // Data states
@@ -65,9 +68,15 @@ export default function AdminDashboard() {
   const [auditLogs, setAuditLogs] = useState(() => getAuditLogs());
 
   // Selected driver for Auto Admin portal
-  const [selectedAutoId, setSelectedAutoId] = useState(
-    autos[0]?.id || "auto-101"
-  );
+  const [selectedAutoId, setSelectedAutoId] = useState(() => {
+    if (user?.role === "driver" && user.autoNumber) {
+      const all = getAutos();
+      const matched = all.find((a) => a.autoNumber === user.autoNumber);
+      if (matched) return matched.id;
+    }
+    const all = getAutos();
+    return all[0]?.id || "auto-101";
+  });
 
   // Search & Filter in Super Admin
   const [searchQuery, setSearchQuery] = useState("");
@@ -275,30 +284,56 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          {/* Role Switching Pills */}
-          <div className="flex bg-white/10 p-1 rounded-2xl border border-white/10 text-xs">
-            <button
-              onClick={() => setRole("super_admin")}
-              className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all ${
-                role === "super_admin"
-                  ? "bg-amber-400 text-gray-950 shadow-xs"
-                  : "text-gray-300 hover:text-white"
-              }`}
-            >
-              <ShieldCheck size={14} />
-              <span>Super Admin</span>
-            </button>
-            <button
-              onClick={() => setRole("auto_admin")}
-              className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all ${
-                role === "auto_admin"
-                  ? "bg-amber-400 text-gray-950 shadow-xs"
-                  : "text-gray-300 hover:text-white"
-              }`}
-            >
-              <CarTaxiFront size={14} />
-              <span>Auto Admin (Driver)</span>
-            </button>
+          {/* Auth Identity & Role Switching Pills */}
+          <div className="flex items-center gap-2">
+            {user ? (
+              <Link
+                to="/profile"
+                className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-2xl border border-white/10 text-xs transition-colors"
+                title="View Profile"
+              >
+                <div className="w-5 h-5 rounded-full bg-amber-400 text-gray-950 flex items-center justify-center font-black text-[10px]">
+                  {user.name ? user.name[0] : "U"}
+                </div>
+                <span className="font-bold text-gray-200 truncate max-w-[120px]">
+                  {user.name.split(" ")[0]}
+                </span>
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={() => openAuthModal("demo")}
+                className="bg-amber-400 hover:bg-amber-500 text-gray-950 font-black px-3 py-1.5 rounded-2xl text-xs transition-all flex items-center gap-1 shadow-xs"
+              >
+                <Sparkles size={13} />
+                <span>Switch Persona</span>
+              </button>
+            )}
+
+            <div className="flex bg-white/10 p-1 rounded-2xl border border-white/10 text-xs">
+              <button
+                onClick={() => setRole("super_admin")}
+                className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all ${
+                  role === "super_admin"
+                    ? "bg-amber-400 text-gray-950 shadow-xs"
+                    : "text-gray-300 hover:text-white"
+                }`}
+              >
+                <ShieldCheck size={14} />
+                <span>Super Admin</span>
+              </button>
+              <button
+                onClick={() => setRole("auto_admin")}
+                className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all ${
+                  role === "auto_admin"
+                    ? "bg-amber-400 text-gray-950 shadow-xs"
+                    : "text-gray-300 hover:text-white"
+                }`}
+              >
+                <CarTaxiFront size={14} />
+                <span>Auto Admin (Driver)</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -89,7 +89,7 @@ export function getBookingById(id) {
  * @param {number} [params.fareEstimate]
  * @returns {Booking}
  */
-export function createBooking({ auto, pickup, destination, fareEstimate }) {
+export function createBooking({ auto, pickup, destination, fareEstimate, passengerName, passengerPhone, passengerId }) {
   const randomNum = Math.floor(10000 + Math.random() * 90000);
   const bookingNumber = `ABR-${randomNum}`;
 
@@ -106,6 +106,9 @@ export function createBooking({ auto, pickup, destination, fareEstimate }) {
     pickup: pickup || auto.area,
     destination: destination || "Bistupur Market",
     fareEstimate: fareEstimate || auto.fareEstimate || 120,
+    passengerName: passengerName || "Verified Rider",
+    passengerPhone: passengerPhone || "",
+    passengerId: passengerId || "",
     createdAt: new Date().toISOString(),
     status: "accepted",
     paymentStatus: "pending"

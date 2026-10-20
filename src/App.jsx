@@ -10,6 +10,8 @@ import PaymentPage from "@/pages/Payment";
 import BookingsListPage from "@/pages/BookingsList";
 import ScannerPage from "@/pages/Scanner";
 import ChatPage from "@/pages/ChatPage";
+import LoginPage from "@/pages/LoginPage";
+import ProfilePage from "@/pages/ProfilePage";
 import WebLanding from "@/pages/WebLanding";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfService from "@/pages/TermsOfService";
@@ -18,9 +20,11 @@ import NotFound from "@/pages/NotFound";
 import Header from "@/components/Shared/Header";
 import BottomNav from "@/components/Shared/BottomNav";
 import Loader from "@/components/Shared/Loader";
+import AuthModal from "@/components/Auth/AuthModal";
+import { AuthProvider } from "@/context/AuthContext";
 import "./App.css";
 
-function App() {
+function AppContent() {
   const [loading, setLoading] = useState(true);
   const location = useLocation();
 
@@ -59,6 +63,12 @@ function App() {
           <Route path="/search" element={<SearchResultsPage />} />
           <Route path="/verify" element={<VerifyPage />} />
 
+          {/* Authentication & User Profile */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/auth" element={<LoginPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/account" element={<ProfilePage />} />
+
           {/* Auto Details */}
           <Route path="/auto/:id" element={<AutoDetails />} />
           <Route path="/auto-bhaiya/:id" element={<AutoDetails />} />
@@ -93,7 +103,18 @@ function App() {
       </main>
 
       {!hideNavigation && !isScanner && <BottomNav />}
+
+      {/* Global Authentication Modal */}
+      <AuthModal />
     </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 
