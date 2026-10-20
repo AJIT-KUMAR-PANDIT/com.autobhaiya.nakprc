@@ -154,3 +154,24 @@ npm run preview
 ### Issue: QR Code not scanning on test phone
 - **Cause**: Invalid UPI ID format in `payment.json`.
 - **Fix**: Verify `upiId` matches `<username>@<bank/provider>`.
+
+---
+
+## 7. Admin Dashboard & Name Change Rate Limiting
+
+The app provides a dedicated management portal at `/admin` with dual role views:
+
+### 7.1 Super Admin Portal
+- **Fleet Management**: Search and filter autos, toggle driver availability (Online/Offline), edit complete auto profiles, inspect/regenerate verification hashes, and view QR codes.
+- **Quota Overrides & Resets**: Super Admin can edit any auto at any time without rate limits, and can reset a driver's weekly edit quota back to 2 edits with one click.
+- **Rides & Bookings**: Real-time monitor for all ride bookings with instant status progression (`accepted`, `arriving`, `started`, `completed`, `cancelled`).
+- **Audit Logs**: Cryptographic-style audit trail recording all driver name modifications, status toggles, and quota overrides with actor details and timestamps.
+
+### 7.2 Auto Admin (Driver Self-Service Portal)
+- **Driver Shift Management**: One-tap toggle between **ONLINE** (accepting rides) and **OFFLINE** (resting).
+- **2-Times-a-Week Name Change Policy**:
+  - Auto Admins can change their registered Driver Name and Auto Model Name a **maximum of 2 times per 7-day rolling window**.
+  - Remaining quota is tracked in real-time (`2/2`, `1/2`, `0/2`).
+  - When locked (`0/2`), name inputs are disabled, displaying the exact date/time when the next change becomes available.
+  - Non-name fields (phone, area, base fare, vehicle type) remain editable anytime.
+- **Verification QR Badge**: Displays driver's official QR code, security hash, and direct link to passenger verification view.

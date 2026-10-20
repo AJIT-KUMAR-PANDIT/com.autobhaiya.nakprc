@@ -313,11 +313,26 @@ export function validateAutoDataset(dataset = AUTOS) {
 // Run verification at module load time
 validateAutoDataset(AUTOS);
 
+export const AUTOS_STORAGE_KEY = "autobhaiya_managed_autos";
+
 /**
- * Get all autos
+ * Get all autos (merging local storage managed autos if in browser)
  * @returns {Auto[]}
  */
 export function getAutos() {
+  if (typeof window !== "undefined") {
+    try {
+      const raw = localStorage.getItem(AUTOS_STORAGE_KEY);
+      if (raw) {
+        const stored = JSON.parse(raw);
+        if (Array.isArray(stored) && stored.length > 0) {
+          return stored;
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }
   return AUTOS;
 }
 
@@ -329,7 +344,8 @@ export function getAutos() {
 export function getAutoById(id) {
   if (!id) return undefined;
   const clean = id.trim().toLowerCase();
-  return AUTOS.find(
+  const list = getAutos();
+  return list.find(
     (a) =>
       a.id.toLowerCase() === clean ||
       a.autoNumber.toLowerCase() === clean ||
@@ -345,7 +361,8 @@ export function getAutoById(id) {
 export function getAutoByAutoNumber(autoNumber) {
   if (!autoNumber) return undefined;
   const clean = autoNumber.trim().toUpperCase().replace(/[\s_]/g, "-");
-  return AUTOS.find(
+  const list = getAutos();
+  return list.find(
     (a) =>
       a.autoNumber.toUpperCase() === clean ||
       a.autoNumber.toUpperCase().replace("-", "") === clean.replace("-", "")
@@ -385,9 +402,10 @@ export function verifyAuto(autoNumber, verificationHash) {
 
   const cleanAuto = autoNumber.trim().toUpperCase();
   const cleanHash = verificationHash.trim().toUpperCase();
+  const list = getAutos();
 
   // Find Auto by autoNumber (or without hyphen)
-  const matchedAuto = AUTOS.find((a) => {
+  const matchedAuto = list.find((a) => {
     const aNum = a.autoNumber.toUpperCase();
     return aNum === cleanAuto || aNum.replace("-", "") === cleanAuto.replace("-", "");
   });
@@ -445,8 +463,9 @@ export function searchAutos(query = "", filters = {}) {
   const q = (query || "").toLowerCase().trim();
   const categoryFilter = filters?.category && filters.category !== "all" ? filters.category.toLowerCase().trim() : null;
   const fuelFilter = filters?.fuelType && filters.fuelType !== "all" ? filters.fuelType.toLowerCase().trim() : null;
+  const list = getAutos();
 
-  return AUTOS.filter((a) => {
+  return list.filter((a) => {
     // Category filter
     if (categoryFilter && (a.category || "").toLowerCase() !== categoryFilter) {
       return false;
@@ -469,7 +488,7 @@ export function searchAutos(query = "", filters = {}) {
       (a.fuelType && a.fuelType.toLowerCase().includes(q)) ||
       a.area.toLowerCase().includes(q) ||
       a.name.toLowerCase().includes(q) ||
-      a.destinationHints.some((d) => d.toLowerCase().includes(q))
+      (a.destinationHints && a.destinationHints.some((d) => d.toLowerCase().includes(q)))
     );
   });
 }

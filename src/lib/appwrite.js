@@ -5,11 +5,29 @@ import { Client, Databases, ID, Query } from "appwrite";
  * Provides real-time synchronization for rides, bookings, and verified auto statuses.
  */
 
-const ENDPOINT = import.meta.env.VITE_APPWRITE_ENDPOINT || "https://cloud.appwrite.io/v1";
-const PROJECT_ID = import.meta.env.VITE_APPWRITE_PROJECT_ID || "";
-const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID || "autobhaiya_db";
-const BOOKINGS_COLLECTION = import.meta.env.VITE_APPWRITE_BOOKINGS_COLLECTION_ID || "bookings";
-const AUTOS_COLLECTION = import.meta.env.VITE_APPWRITE_AUTOS_COLLECTION_ID || "autos";
+const getEnv = (key, fallback = "") => {
+  try {
+    if (typeof import.meta !== "undefined" && import.meta?.env?.[key]) {
+      return import.meta.env[key];
+    }
+  } catch {
+    // fallback
+  }
+  try {
+    if (typeof process !== "undefined" && process?.env?.[key]) {
+      return process.env[key];
+    }
+  } catch {
+    // fallback
+  }
+  return fallback;
+};
+
+const ENDPOINT = getEnv("VITE_APPWRITE_ENDPOINT", "https://cloud.appwrite.io/v1");
+const PROJECT_ID = getEnv("VITE_APPWRITE_PROJECT_ID", "");
+const DATABASE_ID = getEnv("VITE_APPWRITE_DATABASE_ID", "autobhaiya_db");
+const BOOKINGS_COLLECTION = getEnv("VITE_APPWRITE_BOOKINGS_COLLECTION_ID", "bookings");
+const AUTOS_COLLECTION = getEnv("VITE_APPWRITE_AUTOS_COLLECTION_ID", "autos");
 
 export const isAppwriteConfigured = () => {
   return Boolean(PROJECT_ID && PROJECT_ID.trim().length > 0 && !PROJECT_ID.includes("your-project-id"));

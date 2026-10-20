@@ -311,6 +311,33 @@ export default function Home() {
             </Link>
           </div>
         </div>
+
+        {/* Admin & Driver Command Portal */}
+        <div className="bg-white border border-gray-200 rounded-3xl p-4 shadow-xs flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-gray-950 text-amber-400 flex items-center justify-center shrink-0 shadow-2xs">
+              <ShieldCheck size={20} />
+            </div>
+            <div>
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
+                Fleet Management
+              </span>
+              <h4 className="font-extrabold text-xs text-gray-950">
+                Admin & Auto Driver Portal
+              </h4>
+              <p className="text-[11px] text-gray-500 font-medium">
+                Super admin controls, booking manager & 2x/week driver quota
+              </p>
+            </div>
+          </div>
+          <Link
+            to="/admin"
+            className="bg-gray-900 hover:bg-black text-white font-extrabold px-3.5 py-2 rounded-xl text-xs flex items-center gap-1 shrink-0 transition-transform active:scale-95"
+          >
+            <span>Open</span>
+            <ArrowRight size={13} />
+          </Link>
+        </div>
       </div>
     </div>
   );

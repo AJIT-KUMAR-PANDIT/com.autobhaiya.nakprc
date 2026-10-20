@@ -13,6 +13,7 @@ import ChatPage from "@/pages/ChatPage";
 import WebLanding from "@/pages/WebLanding";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfService from "@/pages/TermsOfService";
+import AdminDashboard from "@/pages/AdminDashboard";
 import NotFound from "@/pages/NotFound";
 import Header from "@/components/Shared/Header";
 import BottomNav from "@/components/Shared/BottomNav";
@@ -34,11 +35,13 @@ function App() {
     return <Loader />;
   }
 
-  // Hide top/bottom chrome on standalone marketing or legal pages
+  // Hide top/bottom chrome on standalone marketing, legal, or dedicated admin portals
   const hideNavigation = [
     "/web",
     "/privacy-policy",
-    "/terms-of-service"
+    "/terms-of-service",
+    "/admin",
+    "/admin/dashboard"
   ].includes(location.pathname);
 
   // Full-bleed scanner
@@ -74,6 +77,10 @@ function App() {
 
           {/* Chat & Support */}
           <Route path="/chat" element={<ChatPage />} />
+
+          {/* Admin Dashboard (Super Admin & Auto Driver Admin) */}
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
           {/* Marketing & Legal */}
           <Route path="/web" element={<WebLanding />} />
