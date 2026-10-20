@@ -42,13 +42,23 @@ export default function BookingsListPage() {
             </h1>
           </div>
 
-          <Link
-            to="/search"
-            className="bg-amber-400 hover:bg-amber-500 text-gray-950 font-bold text-xs px-3.5 py-2 rounded-xl transition-colors shadow-xs"
-            data-testid="new-ride-btn"
-          >
-            New Ride
-          </Link>
+          <div className="flex items-center gap-1.5">
+            <Link
+              to="/rent"
+              className="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs px-2.5 py-2 rounded-xl transition-colors border border-emerald-200 flex items-center gap-1"
+            >
+              <CarTaxiFront size={14} />
+              <span>Rentals</span>
+            </Link>
+
+            <Link
+              to="/search"
+              className="bg-amber-400 hover:bg-amber-500 text-gray-950 font-bold text-xs px-3 py-2 rounded-xl transition-colors shadow-xs"
+              data-testid="new-ride-btn"
+            >
+              New Ride
+            </Link>
+          </div>
         </div>
       </div>
 

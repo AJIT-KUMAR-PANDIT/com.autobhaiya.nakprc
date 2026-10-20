@@ -19,6 +19,15 @@ import {
   isValidPhone,
   DEMO_PROFILES
 } from "./src/data/auth.js";
+import {
+  RENTAL_PACKAGES,
+  RENTAL_DRIVERS,
+  RENTAL_SERVICE_TYPES,
+  getRentalBookings,
+  createRentalBooking,
+  getRentalById,
+  updateRentalStatus
+} from "./src/data/rentals.js";
 import { readFileSync } from "fs";
 import { resolve } from "path";
 
@@ -247,6 +256,56 @@ assert(getStoredUser()?.role === "super_admin", "getStoredUser reflects super_ad
 // Test Sign Out
 clearStoredUser();
 assert(getStoredUser() === null, "clearStoredUser successfully signs out user");
+
+// 8. RENT A DRIVER & HOURLY AUTO RENTALS
+console.log("\n8. Testing Rent a Driver & Hourly Auto Rentals...");
+
+// Test packages
+assert(RENTAL_PACKAGES.length >= 3, `Has at least 3 rental packages (found ${RENTAL_PACKAGES.length})`);
+const pkg4h = RENTAL_PACKAGES.find((p) => p.id === "pkg-4h");
+assert(pkg4h && pkg4h.durationHours === 4, "4-hour city rental package is configured");
+assert(pkg4h && pkg4h.price === 650, "4-hour city rental package price is ₹650");
+assert(pkg4h && pkg4h.includedKm === 40, "4-hour city rental includes 40 km");
+
+// Test drivers for rent
+assert(RENTAL_DRIVERS.length >= 3, `Has at least 3 verified rental drivers (found ${RENTAL_DRIVERS.length})`);
+const ashokDriver = RENTAL_DRIVERS.find((d) => d.id === "rd-101");
+assert(ashokDriver && ashokDriver.name === "Ashok Kumar", "Ashok Kumar is available as verified rental driver");
+assert(ashokDriver && ashokDriver.badges.includes("Police Verified"), "Rental driver has Police Verified badge");
+assert(ashokDriver && ashokDriver.rating >= 4.9, "Rental driver has verified 4.9+ rating");
+
+// Test rental booking creation
+const rentalBooking = createRentalBooking({
+  packageId: "pkg-4h",
+  packageName: "Half Day City Rental",
+  serviceType: "auto_and_driver",
+  durationHours: 4,
+  includedKm: 40,
+  totalFare: 650,
+  driverId: "rd-101",
+  driverName: "Ashok Kumar",
+  driverPhone: "+91 98351 23401",
+  autoNumber: "AB-101",
+  vehicleNumber: "JH05-AB-1234",
+  pickupAddress: "Kadma Uliyan, Jamshedpur",
+  startDate: "2026-10-21",
+  startTime: "10:00 AM",
+  passengerName: "Pooja Sharma",
+  passengerPhone: "+91 98765 43210"
+});
+
+assert(rentalBooking && rentalBooking.id.startsWith("RENT-"), "Rental booking generated with RENT- prefix");
+assert(rentalBooking.status === "confirmed", "Rental booking status initialized to confirmed");
+assert(rentalBooking.totalFare === 650, "Rental booking reflects package fare of ₹650");
+
+// Test lookup by ID
+const fetchedRental = getRentalById(rentalBooking.id);
+assert(fetchedRental && fetchedRental.driverName === "Ashok Kumar", "getRentalById retrieves matching rental booking");
+
+// Test status update
+const updatedRental = updateRentalStatus(rentalBooking.id, "completed", "completed");
+assert(updatedRental && updatedRental.status === "completed", "updateRentalStatus updates status to completed");
+assert(updatedRental && updatedRental.paymentStatus === "completed", "updateRentalStatus updates paymentStatus to completed");
 
 // SUMMARY
 console.log(`\n========================================`);

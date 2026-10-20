@@ -16,7 +16,9 @@ import {
   Factory,
   Train,
   Fuel,
-  Filter
+  Filter,
+  CarTaxiFront,
+  Sparkles
 } from "lucide-react";
 import { getAutos, CATEGORIES, FUEL_TYPES } from "../../data/autos.js";
 import AutoCard from "../Shared/AutoCard.jsx";
@@ -106,14 +108,14 @@ export default function Home() {
           </form>
 
           {/* Quick Service Action Grid */}
-          <div className="grid grid-cols-4 gap-2 pt-1 text-center">
+          <div className="grid grid-cols-5 gap-1.5 pt-1 text-center">
             <Link
               to="/scan"
-              className="bg-white/80 backdrop-blur-sm border border-amber-200/80 p-2.5 rounded-2xl flex flex-col items-center hover:bg-white active:scale-95 transition-all shadow-2xs"
+              className="bg-white/80 backdrop-blur-sm border border-amber-200/80 p-2 rounded-2xl flex flex-col items-center hover:bg-white active:scale-95 transition-all shadow-2xs"
               data-testid="quick-scan-btn"
             >
-              <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center mb-1">
-                <QrCode size={18} />
+              <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center mb-1">
+                <QrCode size={16} />
               </div>
               <span className="text-[10px] font-bold text-gray-900 leading-tight">
                 Scan QR
@@ -121,12 +123,28 @@ export default function Home() {
             </Link>
 
             <Link
+              to="/rent"
+              className="bg-white/90 backdrop-blur-sm border-2 border-emerald-500/60 p-2 rounded-2xl flex flex-col items-center hover:bg-white active:scale-95 transition-all shadow-2xs relative"
+              data-testid="quick-rent-btn"
+            >
+              <span className="absolute -top-1.5 right-1 bg-amber-400 text-gray-950 font-black text-[8px] uppercase px-1 rounded shadow-2xs">
+                Rent
+              </span>
+              <div className="w-8 h-8 rounded-xl bg-amber-400 text-gray-950 flex items-center justify-center mb-1 shadow-2xs">
+                <CarTaxiFront size={16} />
+              </div>
+              <span className="text-[10px] font-extrabold text-emerald-950 leading-tight">
+                Rent Bhaiya
+              </span>
+            </Link>
+
+            <Link
               to="/verify"
-              className="bg-white/80 backdrop-blur-sm border border-amber-200/80 p-2.5 rounded-2xl flex flex-col items-center hover:bg-white active:scale-95 transition-all shadow-2xs"
+              className="bg-white/80 backdrop-blur-sm border border-amber-200/80 p-2 rounded-2xl flex flex-col items-center hover:bg-white active:scale-95 transition-all shadow-2xs"
               data-testid="quick-verify-btn"
             >
-              <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-900 flex items-center justify-center mb-1">
-                <ShieldCheck size={18} />
+              <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-900 flex items-center justify-center mb-1">
+                <ShieldCheck size={16} />
               </div>
               <span className="text-[10px] font-bold text-gray-900 leading-tight">
                 Verify
@@ -135,11 +153,11 @@ export default function Home() {
 
             <Link
               to="/search"
-              className="bg-white/80 backdrop-blur-sm border border-amber-200/80 p-2.5 rounded-2xl flex flex-col items-center hover:bg-white active:scale-95 transition-all shadow-2xs"
+              className="bg-white/80 backdrop-blur-sm border border-amber-200/80 p-2 rounded-2xl flex flex-col items-center hover:bg-white active:scale-95 transition-all shadow-2xs"
               data-testid="quick-directory-btn"
             >
-              <div className="w-9 h-9 rounded-xl bg-blue-100 text-blue-900 flex items-center justify-center mb-1">
-                <Car size={18} />
+              <div className="w-8 h-8 rounded-xl bg-blue-100 text-blue-900 flex items-center justify-center mb-1">
+                <Car size={16} />
               </div>
               <span className="text-[10px] font-bold text-gray-900 leading-tight">
                 All Autos
@@ -148,11 +166,11 @@ export default function Home() {
 
             <Link
               to="/bookings"
-              className="bg-white/80 backdrop-blur-sm border border-amber-200/80 p-2.5 rounded-2xl flex flex-col items-center hover:bg-white active:scale-95 transition-all shadow-2xs"
+              className="bg-white/80 backdrop-blur-sm border border-amber-200/80 p-2 rounded-2xl flex flex-col items-center hover:bg-white active:scale-95 transition-all shadow-2xs"
               data-testid="quick-rides-btn"
             >
-              <div className="w-9 h-9 rounded-xl bg-purple-100 text-purple-900 flex items-center justify-center mb-1">
-                <Clock size={18} />
+              <div className="w-8 h-8 rounded-xl bg-purple-100 text-purple-900 flex items-center justify-center mb-1">
+                <Clock size={16} />
               </div>
               <span className="text-[10px] font-bold text-gray-900 leading-tight">
                 My Rides
@@ -258,6 +276,54 @@ export default function Home() {
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Rent Auto & Driver by the Hour Section */}
+        <div className="bg-gradient-to-br from-amber-400 via-amber-300 to-yellow-200 rounded-3xl p-5 shadow-xs text-gray-950 space-y-3 relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 bg-black/10 px-2.5 py-0.5 rounded-full text-xs font-black">
+              <CarTaxiFront size={14} />
+              <span>Chauffeur & Rental Fleet</span>
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-wider bg-white text-emerald-800 px-2 py-0.5 rounded-full shadow-2xs">
+              Waiting Included
+            </span>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-black text-gray-950 leading-tight">
+              Rent an Auto Bhaiya by the Hour
+            </h3>
+            <p className="text-xs font-semibold text-gray-800 mt-0.5">
+              Multi-stop shopping, TMH hospital visits, or hiring a driver for your own vehicle.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 text-center text-xs">
+            <div className="bg-white/90 backdrop-blur-xs p-2 rounded-2xl border border-amber-300">
+              <span className="text-[10px] text-gray-500 font-bold block">2 Hours</span>
+              <span className="font-black text-gray-900 text-sm">₹350</span>
+              <span className="text-[9px] text-gray-500 block">20 km</span>
+            </div>
+            <div className="bg-white/90 backdrop-blur-xs p-2 rounded-2xl border border-amber-300 ring-2 ring-emerald-500/20">
+              <span className="text-[10px] text-emerald-700 font-bold block">4 Hours</span>
+              <span className="font-black text-gray-900 text-sm">₹650</span>
+              <span className="text-[9px] text-gray-500 block">40 km</span>
+            </div>
+            <div className="bg-white/90 backdrop-blur-xs p-2 rounded-2xl border border-amber-300">
+              <span className="text-[10px] text-gray-500 font-bold block">Full Day</span>
+              <span className="font-black text-gray-900 text-sm">₹1,200</span>
+              <span className="text-[9px] text-gray-500 block">80 km</span>
+            </div>
+          </div>
+
+          <Link
+            to="/rent"
+            className="w-full py-3 rounded-2xl bg-gray-950 hover:bg-black text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-md transition-transform active:scale-98"
+          >
+            <span>Book Auto & Driver Rental</span>
+            <ArrowRight size={15} />
+          </Link>
         </div>
 
         {/* Nearby Verified Auto Bhaiyas */}

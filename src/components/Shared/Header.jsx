@@ -8,7 +8,8 @@ import {
   Clock,
   ChevronDown,
   Sparkles,
-  ShieldAlert
+  ShieldAlert,
+  CarTaxiFront
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext.jsx";
 
@@ -123,6 +124,14 @@ export default function Header() {
                     >
                       <Clock size={15} className="text-gray-400" />
                       <span>Ride Bookings</span>
+                    </Link>
+                    <Link
+                      to="/rent"
+                      onClick={() => setMenuOpen(false)}
+                      className="w-full px-3 py-2 text-xs font-bold text-emerald-800 hover:bg-emerald-50 flex items-center gap-2 transition-colors"
+                    >
+                      <CarTaxiFront size={15} className="text-emerald-700" />
+                      <span>Rent Auto & Driver</span>
                     </Link>
                     <Link
                       to="/admin"

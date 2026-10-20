@@ -12,6 +12,8 @@ import ScannerPage from "@/pages/Scanner";
 import ChatPage from "@/pages/ChatPage";
 import LoginPage from "@/pages/LoginPage";
 import ProfilePage from "@/pages/ProfilePage";
+import RentDriverPage from "@/pages/RentDriver";
+import PersonalBhaiyaPage from "@/pages/PersonalBhaiya";
 import WebLanding from "@/pages/WebLanding";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfService from "@/pages/TermsOfService";
@@ -68,6 +70,13 @@ function AppContent() {
           <Route path="/auth" element={<LoginPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/account" element={<ProfilePage />} />
+
+          {/* Rent a Driver & Hourly Auto Rental */}
+          <Route path="/rent" element={<RentDriverPage />} />
+          <Route path="/rent-driver" element={<RentDriverPage />} />
+          <Route path="/rentals" element={<RentDriverPage />} />
+          <Route path="/personal-bhaiya" element={<RentDriverPage />} />
+          <Route path="/personal-bhaiya/:vNumber" element={<PersonalBhaiyaPage />} />
 
           {/* Auto Details */}
           <Route path="/auto/:id" element={<AutoDetails />} />
